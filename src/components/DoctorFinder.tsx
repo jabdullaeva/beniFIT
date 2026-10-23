@@ -5,13 +5,11 @@ import {
   Phone,
   ExternalLink,
   ShieldCheck,
-  Search,
-  Filter,
-  AlertCircle,
   Loader2,
   CheckCircle2,
 } from 'lucide-react';
 import { BeniMascot } from './BeniMascot.tsx';
+import { Translations } from '../lib/translations.ts';
 
 export interface Doctor {
   npi: string;
@@ -30,22 +28,14 @@ export interface Doctor {
 interface DoctorFinderProps {
   userZip: string;
   coverageName: string;
+  t: Translations;
   onZipChange?: (newZip: string) => void;
 }
-
-const SPECIALTY_OPTIONS = [
-  { slug: 'primary-care', label: 'Primary Care / Family Doctor' },
-  { slug: 'cardiologist', label: 'Cardiologist (Heart)' },
-  { slug: 'obgyn', label: "OB/GYN (Women's Health)" },
-  { slug: 'pediatrician', label: 'Pediatrician (Child Care)' },
-  { slug: 'endocrinologist', label: 'Endocrinologist (Diabetes/Thyroid)' },
-  { slug: 'orthopedics', label: 'Orthopedics / Sports Medicine' },
-  { slug: 'mental-health', label: 'Mental Health / Therapy' },
-];
 
 export const DoctorFinder: React.FC<DoctorFinderProps> = ({
   userZip,
   coverageName,
+  t,
   onZipChange,
 }) => {
   const [selectedSpecialty, setSelectedSpecialty] = useState('primary-care');
@@ -53,7 +43,16 @@ export const DoctorFinder: React.FC<DoctorFinderProps> = ({
   const [inNetworkOnly, setInNetworkOnly] = useState(true);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+
+  const specialtyOptions = [
+    { slug: 'primary-care', label: t.specPrimaryCare },
+    { slug: 'cardiologist', label: t.specCardiologist },
+    { slug: 'obgyn', label: t.specObGyn },
+    { slug: 'pediatrician', label: t.specPediatrician },
+    { slug: 'endocrinologist', label: t.specEndocrinologist },
+    { slug: 'orthopedics', label: t.specOrthopedics },
+    { slug: 'mental-health', label: t.specMentalHealth },
+  ];
 
   // Sync if parent userZip changes
   useEffect(() => {
@@ -63,7 +62,6 @@ export const DoctorFinder: React.FC<DoctorFinderProps> = ({
   // Query /api/doctors
   const fetchDoctors = async (spec: string, zip: string) => {
     setLoading(true);
-    setError(null);
     try {
       const res = await fetch(
         `/api/doctors?specialty=${encodeURIComponent(spec)}&zip=${encodeURIComponent(zip)}`
@@ -73,47 +71,46 @@ export const DoctorFinder: React.FC<DoctorFinderProps> = ({
       }
       const data = await res.json();
       setDoctors(data.results || []);
-    } catch (err: any) {
-      console.warn('Doctor fetch error, using local fallback:', err);
+    } catch {
       // High fidelity offline fallback for demo resilience
       setDoctors([
         {
           npi: '1487692341',
           name: 'Dr. Sarah Chen, MD',
-          specialty: spec.includes('cardio') ? 'Cardiovascular Disease' : 'Internal Medicine & Primary Care',
+          specialty: spec.includes('cardio') ? t.specCardiologist : t.specPrimaryCare,
           address: '185 Montague St, Fl 4',
           city: zip.startsWith('104') ? 'Bronx' : zip.startsWith('113') ? 'Flushing' : 'Brooklyn',
           state: 'NY',
           zip: zip || '11201',
           phone: '(718) 555-0142',
           mapsUrl: `https://www.google.com/maps/search/?api=1&query=Dr+Sarah+Chen+${zip}+NY`,
-          acceptsPlanNotice: `In-network with ${coverageName}`,
+          acceptsPlanNotice: `${t.inNetworkBadge}: ${coverageName}`,
           planDirectoryUrl: 'https://www.medicare.gov/care-compare/',
         },
         {
           npi: '1922384751',
           name: 'Dr. Marcus Goldberg, MD',
-          specialty: 'Family Medicine & Preventive Health',
+          specialty: t.specPrimaryCare,
           address: '100 Clinton St, Suite 2B',
           city: zip.startsWith('104') ? 'Bronx' : zip.startsWith('113') ? 'Flushing' : 'Brooklyn',
           state: 'NY',
           zip: zip || '11201',
           phone: '(718) 555-0298',
           mapsUrl: `https://www.google.com/maps/search/?api=1&query=Dr+Marcus+Goldberg+${zip}+NY`,
-          acceptsPlanNotice: `In-network with ${coverageName}`,
+          acceptsPlanNotice: `${t.inNetworkBadge}: ${coverageName}`,
           planDirectoryUrl: 'https://www.medicare.gov/care-compare/',
         },
         {
           npi: '1104829381',
           name: 'Dr. Elena Vasquez, MD',
-          specialty: 'Women’s Health & General Practice',
+          specialty: t.specObGyn,
           address: '240 Atlantic Ave',
           city: zip.startsWith('104') ? 'Bronx' : zip.startsWith('113') ? 'Flushing' : 'Brooklyn',
           state: 'NY',
           zip: zip || '11201',
           phone: '(718) 555-0371',
           mapsUrl: `https://www.google.com/maps/search/?api=1&query=Dr+Elena+Vasquez+${zip}+NY`,
-          acceptsPlanNotice: `In-network with ${coverageName}`,
+          acceptsPlanNotice: `${t.inNetworkBadge}: ${coverageName}`,
           planDirectoryUrl: 'https://www.medicare.gov/care-compare/',
         },
       ]);
@@ -144,15 +141,15 @@ export const DoctorFinder: React.FC<DoctorFinderProps> = ({
               <Stethoscope className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-xs font-bold text-[#0F172A]">Find In-Network Doctors</h3>
+              <h3 className="text-xs font-bold text-[#0F172A]">{t.doctorFinderTitle}</h3>
               <p className="text-[10px] text-slate-500">
-                Matched to your verified ZIP code & plan
+                {t.doctorFinderSub}
               </p>
             </div>
           </div>
           <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
             <ShieldCheck className="w-3 h-3" />
-            Verified Network
+            {t.verifiedNetworkBadge}
           </span>
         </div>
 
@@ -160,14 +157,14 @@ export const DoctorFinder: React.FC<DoctorFinderProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-xs">
           <div>
             <label className="text-[10px] font-bold text-slate-500 block mb-1">
-              Medical Specialty
+              {t.specialtyLabel}
             </label>
             <select
               value={selectedSpecialty}
               onChange={(e) => setSelectedSpecialty(e.target.value)}
               className="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs font-bold text-[#0F172A] focus:outline-none focus:border-[#4F46E5]"
             >
-              {SPECIALTY_OPTIONS.map((opt) => (
+              {specialtyOptions.map((opt) => (
                 <option key={opt.slug} value={opt.slug}>
                   {opt.label}
                 </option>
@@ -177,7 +174,7 @@ export const DoctorFinder: React.FC<DoctorFinderProps> = ({
 
           <div>
             <label className="text-[10px] font-bold text-slate-500 block mb-1">
-              Your Profile ZIP Code
+              {t.zipInputLabel}
             </label>
             <form onSubmit={handleApplyZip} className="flex gap-1.5">
               <div className="relative flex-1">
@@ -195,7 +192,7 @@ export const DoctorFinder: React.FC<DoctorFinderProps> = ({
                 type="submit"
                 className="px-3 py-1.5 bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded-xl text-xs font-bold transition shadow-2xs"
               >
-                Search
+                {t.searchBtn}
               </button>
             </form>
           </div>
@@ -204,7 +201,7 @@ export const DoctorFinder: React.FC<DoctorFinderProps> = ({
         {/* Active Plan Network Pill */}
         <div className="flex items-center justify-between pt-1 border-t border-slate-100 text-[11px]">
           <div className="flex items-center gap-1.5 text-slate-600 truncate">
-            <span className="font-semibold text-slate-500">Plan:</span>
+            <span className="font-semibold text-slate-500">{t.planNetworkLabel}</span>
             <span className="font-bold text-[#0F172A] truncate">{coverageName}</span>
           </div>
           <button
@@ -217,7 +214,7 @@ export const DoctorFinder: React.FC<DoctorFinderProps> = ({
             }`}
           >
             <CheckCircle2 className="w-3 h-3" />
-            In-Network Only
+            {t.inNetworkOnlyBtn}
           </button>
         </div>
       </div>
@@ -226,8 +223,8 @@ export const DoctorFinder: React.FC<DoctorFinderProps> = ({
       {loading && (
         <div className="bg-white border border-[#E2E8F0] rounded-2xl p-6 text-center space-y-2">
           <Loader2 className="w-6 h-6 animate-spin text-[#4F46E5] mx-auto" />
-          <p className="text-xs font-bold text-[#0F172A]">Searching New York Provider Directory...</p>
-          <p className="text-[10px] text-slate-500">Querying NPI registry and matching to {coverageName}</p>
+          <p className="text-xs font-bold text-[#0F172A]">{t.searchingDoctorsTitle}</p>
+          <p className="text-[10px] text-slate-500">{t.searchingDoctorsSub} {coverageName}</p>
         </div>
       )}
 
@@ -235,8 +232,8 @@ export const DoctorFinder: React.FC<DoctorFinderProps> = ({
       {!loading && doctors.length > 0 && (
         <div className="space-y-2.5">
           <div className="flex items-center justify-between px-1 text-[11px] text-slate-500 font-bold">
-            <span>Found {doctors.length} in-network doctors near {zipInput}</span>
-            <span className="text-slate-400">Within 5 miles</span>
+            <span>{t.foundDoctorsNear} {zipInput} ({doctors.length})</span>
+            <span className="text-slate-400">{t.withinMiles}</span>
           </div>
 
           {doctors.map((doc, idx) => (
@@ -251,7 +248,7 @@ export const DoctorFinder: React.FC<DoctorFinderProps> = ({
                       {doc.name}
                     </h4>
                     <span className="text-[10px] font-bold px-1.5 py-0.5 bg-emerald-50 text-emerald-700 rounded border border-emerald-200">
-                      In-Network
+                      {t.inNetworkBadge}
                     </span>
                   </div>
                   <p className="text-[11px] font-bold text-slate-600 mt-0.5">{doc.specialty}</p>
@@ -275,7 +272,7 @@ export const DoctorFinder: React.FC<DoctorFinderProps> = ({
                   className="flex-1 py-2 bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-2xs transition"
                 >
                   <Phone className="w-3.5 h-3.5" />
-                  <span>Call {doc.phone}</span>
+                  <span>{t.callDoctorBtn} {doc.phone}</span>
                 </a>
 
                 <a
@@ -283,10 +280,10 @@ export const DoctorFinder: React.FC<DoctorFinderProps> = ({
                   target="_blank"
                   rel="noreferrer"
                   className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-[#0F172A] rounded-xl text-xs font-bold flex items-center justify-center gap-1 transition"
-                  title="Open in Google Maps"
+                  title="Google Maps"
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
-                  <span>Directions</span>
+                  <span>{t.directionsBtn}</span>
                 </a>
               </div>
             </div>
@@ -298,7 +295,7 @@ export const DoctorFinder: React.FC<DoctorFinderProps> = ({
       <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3 flex items-start gap-2.5 text-xs text-amber-900">
         <BeniMascot size={22} expression="default" />
         <div className="text-[11px] leading-relaxed">
-          <strong>Beni Reminder:</strong> Provider directories change frequently. When calling reception to book your appointment, verify they are participating with your specific plan name: <em>{coverageName}</em>.
+          <strong>{t.doctorDisclaimerTitle}</strong> {t.doctorDisclaimerText} <em>{coverageName}</em>.
         </div>
       </div>
     </div>

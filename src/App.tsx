@@ -7,438 +7,59 @@ import {
   Globe,
   Shield,
   Briefcase,
-  FileText,
-  ChevronRight,
-  ArrowRight,
-  CheckCircle2,
-  AlertTriangle,
-  HelpCircle,
+  ExternalLink,
+  Check,
+  ArrowLeft,
+  LogOut,
+  Lock,
+  Edit3,
+  Bell,
+  CreditCard,
+  Stethoscope,
+  Send,
+  X,
   Copy,
   Mail,
   Phone,
   Sparkles,
-  Send,
-  X,
-  Plus,
-  RotateCcw,
-  ExternalLink,
-  Check,
-  Menu,
-  ArrowLeft,
-  Info,
-  LogOut,
-  Lock,
-  UploadCloud,
-  Edit3,
-  Bell,
-  CreditCard,
-  User,
-  Stethoscope,
-  MapPin,
-  Search,
-  Share2,
-  CheckCircle,
-  QrCode,
   Wifi,
-  AlertCircle,
-  Sliders,
-  UserCheck,
+  CheckCircle,
   RefreshCw,
+  MessageCircle,
 } from 'lucide-react';
 import { BeniMascot, BeniExpression } from './components/BeniMascot.tsx';
-import { TRANSLATIONS, SupportedLang } from './lib/translations.ts';
+import { TRANSLATIONS, SupportedLang, Translations } from './lib/translations.ts';
 import { DoctorFinder } from './components/DoctorFinder.tsx';
 import { DigitalWallet } from './components/DigitalWallet.tsx';
+import { getLocalizedPersona, FindingItem } from './lib/localizedPersonas.ts';
 
-// =========================================================================
-// DATA CONTRACTS (BeniFIT Brand Board System)
-// =========================================================================
 export type ScreenId = 'connect' | 'found' | 'planner' | 'bills' | 'doctors' | 'chat' | 'language';
 
-interface FindingItem {
-  id: string;
-  type: 'may_qualify' | 'confirmed';
-  category: 'hidden_benefit' | 'unclaimed_program' | 'bill_error' | 'fsa' | 'food';
-  title: string;
-  subtitle: string;
-  amount: number;
-  amountLabel: string;
-  source: string;
-  actionLabel: string;
-  actionKind: 'call' | 'open_app' | 'claim' | 'view' | 'apply' | 'learn_more';
-  deadline?: string;
-  explanation: string;
-}
-
-interface DemoPersona {
-  id: 'maria' | 'ana' | 'joe';
-  name: string;
-  age: number;
-  location: string;
-  coverageName: string;
-  claimsCount: number;
-  totalSavings: number;
-  mayQualifyTotal: number;
-  confirmedTotal: number;
-  incomeMonthly: number;
-  householdSize: number;
-  memberId: string;
-  groupNumber: string;
-  rxBin: string;
-  rxPcn: string;
-  rxGroup: string;
-  copays: {
-    pcp: string;
-    specialist: string;
-    urgentCare?: string;
-    genericRx: string;
-    er: string;
-  };
-  deductible: {
-    total: number;
-    met: number;
-  };
-  outOfPocketMax: {
-    total: number;
-    met: number;
-  };
-  fsaBalance?: number;
-  fsaCardNumber?: string;
-  fsaExpires?: string;
-  findings: FindingItem[];
-  mriBill: {
-    billed: number;
-    patientOwedPerPlan: number;
-    discrepancy: number;
-    errorSummary: string;
-    source: string;
-    providerName: string;
-    providerPhone: string;
-    providerEmail: string;
-    disputeDraft: string;
-  };
-}
-
-const DEMO_PERSONAS: Record<'maria' | 'ana' | 'joe', DemoPersona> = {
-  maria: {
-    id: 'maria',
-    name: 'Maria Alvarez',
-    age: 38,
-    location: 'Brooklyn, NY 11201',
-    coverageName: 'ClearPath Comprehensive PPO',
-    claimsCount: 4,
-    totalSavings: 1265,
-    mayQualifyTotal: 780, // $320 FSA + $150 food/wellness + $310 ride perk = $780
-    confirmedTotal: 485, // $485 duplicate MRI hospital bill
-    incomeMonthly: 4200,
-    householdSize: 1,
-    memberId: 'CP-90214-NY',
-    groupNumber: 'NY-772',
-    rxBin: '004336',
-    rxPcn: 'ADV',
-    rxGroup: 'RX772',
-    copays: {
-      pcp: '$20',
-      specialist: '$40',
-      urgentCare: '$35',
-      genericRx: '$15',
-      er: '$150',
-    },
-    deductible: {
-      total: 1000,
-      met: 450,
-    },
-    outOfPocketMax: {
-      total: 4500,
-      met: 1200,
-    },
-    fsaBalance: 320,
-    fsaCardNumber: '4821',
-    fsaExpires: 'Dec 31, 2027',
-    findings: [
-      {
-        id: 'f-1',
-        type: 'may_qualify',
-        category: 'fsa',
-        title: 'Unused FSA funds',
-        subtitle: '$320 • Employer benefits',
-        amount: 320,
-        amountLabel: '$320',
-        source: 'Brightway 2027 Benefits Guide p.11',
-        actionLabel: 'Claim it',
-        actionKind: 'claim',
-        deadline: '⏰ Dec 31',
-        explanation: 'You have $320 in your Flexible Spending Account. Prescription glasses, sunscreen, and first-aid items qualify.',
-      },
-      {
-        id: 'f-2',
-        type: 'may_qualify',
-        category: 'food',
-        title: 'Food assistance program',
-        subtitle: '$150 • State program',
-        amount: 150,
-        amountLabel: '$150',
-        source: 'NY State Food Relief Guidelines',
-        actionLabel: 'Apply',
-        actionKind: 'apply',
-        explanation: 'Based on your household size in Brooklyn, you may qualify for $150/mo in grocery purchasing help.',
-      },
-      {
-        id: 'f-3',
-        type: 'may_qualify',
-        category: 'hidden_benefit',
-        title: 'Free ride assistance',
-        subtitle: '$310 • Health exchange / plan',
-        amount: 310,
-        amountLabel: '$310',
-        source: 'ClearPath RideCare Guide p.7',
-        actionLabel: 'Learn more',
-        actionKind: 'learn_more',
-        explanation: 'Your ClearPath plan covers up to 12 free roundtrip rides per year to doctors and imaging centers via Uber Health.',
-      },
-      {
-        id: 'f-4',
-        type: 'confirmed',
-        category: 'bill_error',
-        title: 'Duplicate MRI charge',
-        subtitle: '$485 • Hospital bill',
-        amount: 485,
-        amountLabel: '$485',
-        source: 'Mercy Grove Bill MG-88213 vs. Claim EOB-0004',
-        actionLabel: 'View details',
-        actionKind: 'view',
-        explanation: 'This charge appears to be a duplicate of a claim already paid by your insurance. Insurance paid $720, contractual liability is $180.',
-      },
-    ],
-    mriBill: {
-      billed: 485.0,
-      patientOwedPerPlan: 180.0,
-      discrepancy: 485.0,
-      errorSummary:
-        'This charge appears to be a duplicate of a claim already paid by your insurance. Mercy Grove Hospital billed line 70553 twice; ClearPath denied the second line as duplicate care, but the hospital moved it to patient balance.',
-      source: 'Hospital bill MG-88213 + insurance claim EOB-0004',
-      providerName: 'Mercy Grove Hospital (City Imaging)',
-      providerPhone: '(212) 555-0180',
-      providerEmail: 'billing@mercygrove.org',
-      disputeDraft:
-        'To Mercy Grove Billing Office:\nRe: Patient Maria Alvarez (DOB: 1988-06-14, Invoice #MG-88213)\n\nI am disputing the billed patient balance of $485.00 for MRI procedure 70553 performed on 2027-10-12. ClearPath EOB #EOB-0004 confirms the contractual allowed amount was paid ($720.00), leaving patient responsibility as $180.00.\n\nThe second charge on my invoice is an identical duplicate that was denied by ClearPath as non-payable duplicate care. Under New York balance billing protections, duplicate charges cannot be transferred to the patient.\n\nPlease zero out this duplicate balance of $485.00 and issue a corrected statement.\n\nThank you,\nMaria Alvarez',
-    },
-  },
-  ana: {
-    id: 'ana',
-    name: 'Ana Torres',
-    age: 26,
-    location: 'Bronx, NY 10451',
-    coverageName: 'HarborCare NY Medicaid Managed Care',
-    claimsCount: 3,
-    totalSavings: 3100,
-    mayQualifyTotal: 1950,
-    confirmedTotal: 1150,
-    incomeMonthly: 1650,
-    householdSize: 2,
-    memberId: 'HB-33819-BX',
-    groupNumber: 'NY-MED-04',
-    rxBin: '012345',
-    rxPcn: 'NYRX',
-    rxGroup: 'NYMED',
-    copays: {
-      pcp: '$0',
-      specialist: '$0',
-      urgentCare: '$0',
-      genericRx: '$1-$3',
-      er: '$0',
-    },
-    deductible: {
-      total: 0,
-      met: 0,
-    },
-    outOfPocketMax: {
-      total: 0,
-      met: 0,
-    },
-    findings: [
-      {
-        id: 'f-ana-1',
-        type: 'confirmed',
-        category: 'bill_error',
-        title: 'Emergency room balance bill',
-        subtitle: '$1,150 • Hospital bill',
-        amount: 1150,
-        amountLabel: '$1,150',
-        source: 'Bronx Central Bill #BC-99214 vs HarborCare Medicaid',
-        actionLabel: 'View details',
-        actionKind: 'view',
-        explanation: 'New York Medicaid covers emergency department visits in full. Providers are strictly prohibited from balance billing Medicaid patients.',
-      },
-      {
-        id: 'f-ana-2',
-        type: 'may_qualify',
-        category: 'food',
-        title: 'WIC Nutrition benefit ($100/mo)',
-        subtitle: '$1,200 • State program',
-        amount: 1200,
-        amountLabel: '$1,200/yr',
-        source: 'NY DOH WIC Guidelines p.2',
-        actionLabel: 'Apply',
-        actionKind: 'apply',
-        explanation: 'Because you are pregnant or have a young baby, you may qualify for $100/mo in fruit, milk, and healthy groceries.',
-      },
-      {
-        id: 'f-ana-3',
-        type: 'may_qualify',
-        category: 'hidden_benefit',
-        title: 'Covered doula care services',
-        subtitle: '$750 • Medicaid perk',
-        amount: 750,
-        amountLabel: '100% Covered',
-        source: 'HarborCare 2026 Medicaid Benefits',
-        actionLabel: 'Learn more',
-        actionKind: 'learn_more',
-        explanation: 'NY Medicaid covers certified doula birth workers at $0 out-of-pocket for prenatal, labor, and postpartum support.',
-      },
-    ],
-    mriBill: {
-      billed: 1150.0,
-      patientOwedPerPlan: 0.0,
-      discrepancy: 1150.0,
-      errorSummary:
-        'Bronx Central Hospital billed $1,150.00 for emergency care. Under NY Public Health Law and federal Medicaid rules, participating providers cannot bill Medicaid members for covered emergency services.',
-      source: 'Bronx Central Bill #BC-99214 + HarborCare Medicaid',
-      providerName: 'Bronx Central Hospital',
-      providerPhone: '(718) 555-0199',
-      providerEmail: 'billing@bronxcentral.org',
-      disputeDraft:
-        'To Bronx Central Billing Department:\nRe: Patient Ana Torres (Medicaid ID: HC-992014, Invoice #BC-99214)\n\nI am disputing the billed balance of $1,150.00. I am an active beneficiary of HarborCare NY Medicaid. Under NY State regulations, emergency room care is covered at 100% with $0 copay.\n\nParticipating providers are legally prohibited from balance billing Medicaid members. Please cancel this balance immediately and confirm $0 balance in writing.\n\nSincerely,\nAna Torres',
-    },
-  },
-  joe: {
-    id: 'joe',
-    name: 'Joe Kowalski',
-    age: 72,
-    location: 'Queens, NY 11355',
-    coverageName: 'SilverPath Choice Medicare Advantage (HMO)',
-    claimsCount: 3,
-    totalSavings: 4200,
-    mayQualifyTotal: 4115,
-    confirmedTotal: 85,
-    incomeMonthly: 1800,
-    householdSize: 1,
-    memberId: '1EG4-TE5-MK72',
-    groupNumber: 'SP-MED-77',
-    rxBin: '610014',
-    rxPcn: 'MEDD',
-    rxGroup: 'PARTD',
-    copays: {
-      pcp: '$0',
-      specialist: '$15',
-      urgentCare: '$20',
-      genericRx: '$0 Tier 1',
-      er: '$90',
-    },
-    deductible: {
-      total: 240,
-      met: 240,
-    },
-    outOfPocketMax: {
-      total: 3400,
-      met: 890,
-    },
-    fsaBalance: 85,
-    fsaCardNumber: '9912',
-    fsaExpires: 'Quarter End',
-    findings: [
-      {
-        id: 'f-joe-1',
-        type: 'confirmed',
-        category: 'bill_error',
-        title: 'Insulin copay overcharge',
-        subtitle: '$85 • Pharmacy receipt',
-        amount: 85,
-        amountLabel: '$85 refund',
-        source: 'Main St Pharmacy Receipt #RX-4412',
-        actionLabel: 'View details',
-        actionKind: 'view',
-        explanation: 'Pharmacy charged $120. Under Medicare Part D senior caps, insulin copay is legally capped at $35.00/month.',
-      },
-      {
-        id: 'f-joe-2',
-        type: 'may_qualify',
-        category: 'unclaimed_program',
-        title: 'Medicare Savings Program (Part B)',
-        subtitle: '$2,220 • State assistance',
-        amount: 2220,
-        amountLabel: '$185 / mo',
-        source: 'NY DOH MSP Guidelines 2026',
-        actionLabel: 'Apply',
-        actionKind: 'apply',
-        explanation: 'New York will pay your $185 monthly Part B premium directly into your Social Security check if you meet income limits.',
-      },
-      {
-        id: 'f-joe-3',
-        type: 'may_qualify',
-        category: 'food',
-        title: 'SNAP senior grocery support',
-        subtitle: '$1,895 • State program',
-        amount: 1895,
-        amountLabel: '$158 / mo',
-        source: 'OTDA NY SNAP Guidelines',
-        actionLabel: 'Apply',
-        actionKind: 'apply',
-        explanation: 'You may be eligible for about $158 a month on an EBT card for grocery markets.',
-      },
-    ],
-    mriBill: {
-      billed: 120.0,
-      patientOwedPerPlan: 35.0,
-      discrepancy: 85.0,
-      errorSummary:
-        'Main St Pharmacy charged $120.00 cash price for a 30-day insulin supply. Under the federal Inflation Reduction Act and NY Senior protections, Medicare Part D insulin is legally capped at $35.00 per month.',
-      source: 'Main St. Pharmacy Receipt #RX-4412 vs. Medicare Part D',
-      providerName: 'Main St. Pharmacy',
-      providerPhone: '(718) 555-0144',
-      providerEmail: 'rx@mainstpharmacy.com',
-      disputeDraft:
-        'To Main St. Pharmacy Manager:\nRe: Patient Joe Kowalski (Rx #RX-4412, SilverPath Medicare ID: SP-77291)\n\nI was charged $120.00 for my Novolog insulin refill. Under federal Medicare Part D regulations, insulin copays are capped at $35.00 for a 30-day supply.\n\nPlease process an immediate refund of the $85.00 overcharge to my account.\n\nThank you,\nJoe Kowalski',
-    },
-  },
-};
-
 export default function App() {
-  // Authentication & Login Gate (User must log in before accessing inside of app!)
+  // Authentication & Login Gate
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  // Login form inputs
   const [loginEmail, setLoginEmail] = useState('maria@demo.benifit');
   const [loginPassword, setLoginPassword] = useState('beni2026');
   const [loginError, setLoginError] = useState('');
 
-  // Explicit Income & Document Upload Verification Gate (Beni NEVER assumes income!)
+  // Verified Income & Household state (Beni NEVER assumes income!)
   const [hasVerifiedIncomeAndDocs, setHasVerifiedIncomeAndDocs] = useState(false);
   const [showIncomeEditModal, setShowIncomeEditModal] = useState(false);
-
-  // Active user income & upload state
   const [userMonthlyIncome, setUserMonthlyIncome] = useState<number>(4200);
   const [userHouseholdSize, setUserHouseholdSize] = useState<number>(1);
   const [userZip, setUserZip] = useState<string>('11201');
-  const [userInsuranceUploaded, setUserInsuranceUploaded] = useState(true);
-  const [userBenefitsGuideUploaded, setUserBenefitsGuideUploaded] = useState(true);
-  const [userBillsUploaded, setUserBillsUploaded] = useState(true);
 
-  // Current screen matching the brand system board (1 of 6)
+  // Screen & Language State
   const [activeScreen, setActiveScreen] = useState<ScreenId>('connect');
-
-  // Language state (English, Spanish, French, Ukrainian)
   const [lang, setLang] = useState<SupportedLang>('en');
-  const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
+  const t: Translations = TRANSLATIONS[lang] || TRANSLATIONS.en;
 
   // Active persona
   const [activePersonaKey, setActivePersonaKey] = useState<'maria' | 'ana' | 'joe'>('maria');
-  const persona = DEMO_PERSONAS[activePersonaKey];
+  const persona = getLocalizedPersona(activePersonaKey, lang);
 
-  // Planner filter tab: 'all' | 'may_qualify' | 'confirmed'
+  // Planner filter tab
   const [plannerFilter, setPlannerFilter] = useState<'all' | 'may_qualify' | 'confirmed'>('all');
-
-  // Planner new item text
   const [plannerText, setPlannerText] = useState('');
   const [userPlannerItems, setUserPlannerItems] = useState<Array<{ id: string; text: string; date: string }>>([]);
 
@@ -447,71 +68,36 @@ export default function App() {
   const [showBillDisputeModal, setShowBillDisputeModal] = useState(false);
   const [copiedSuccess, setCopiedSuccess] = useState(false);
 
-  // New features requested by user:
-  // 1. My Account Profile Modal (replacing top corner persona dropdown)
+  // My Account Profile Modal
   const [showAccountModal, setShowAccountModal] = useState(false);
 
-  // 2. Proactive Alert System (turn on/off, alert types, quiet hours, test alert)
+  // Proactive Alert System & Real SMS Delivery Simulation
   const [showAlertsModal, setShowAlertsModal] = useState(false);
   const [proactiveAlertsEnabled, setProactiveAlertsEnabled] = useState(true);
   const [billDiscrepancyAlerts, setBillDiscrepancyAlerts] = useState(true);
   const [fsaExpirationAlerts, setFsaExpirationAlerts] = useState(true);
   const [annualRecertAlerts, setAnnualRecertAlerts] = useState(true);
   const [smsAlertsEnabled, setSmsAlertsEnabled] = useState(true);
-  const [testAlertBanner, setTestAlertBanner] = useState<{
-    title: string;
+  const [userPhoneNumber, setUserPhoneNumber] = useState('(718) 555-0198');
+  const [isSendingSms, setIsSendingSms] = useState(false);
+  const [smsSentSuccessMsg, setSmsSentSuccessMsg] = useState('');
+
+  // Simulated Push Notification Banner (like an iOS / Android lockscreen SMS banner)
+  const [incomingSmsBanner, setIncomingSmsBanner] = useState<{
+    header: string;
+    sender: string;
     message: string;
-    actionText?: string;
-    onAction?: () => void;
+    onTap: () => void;
   } | null>(null);
 
-  // 3. Simulated CMS Interoperability / SMART on FHIR API Sync
+  // CMS Interoperability FHIR Sync state
   const [showApiConnectModal, setShowApiConnectModal] = useState(false);
-  const [isApiConnected, setIsApiConnected] = useState(true);
   const [apiSyncState, setApiSyncState] = useState<'idle' | 'authorizing' | 'fetching' | 'synced'>('synced');
   const [lastApiSyncedAt, setLastApiSyncedAt] = useState('Just now');
   const [selectedInsurer, setSelectedInsurer] = useState('Fidelis Care / CMS Interoperability FHIR');
 
-  // 4. Bill Check Screen Tab ('discrepancies' | 'wallet')
+  // Bill Check Screen Tab ('discrepancies' | 'wallet')
   const [billsActiveTab, setBillsActiveTab] = useState<'discrepancies' | 'wallet'>('discrepancies');
-
-  // Trigger simulated proactive alert
-  const handleTriggerTestAlert = async () => {
-    setTestAlertBanner({
-      title: '🚨 Discrepancy Alert',
-      message: `${persona.mriBill.providerName}: $${persona.mriBill.discrepancy.toFixed(0)} duplicate charge found. Dispute drafted.`,
-      actionText: 'View Letter',
-      onAction: () => {
-        setSelectedBillFinding(persona.findings.find((f) => f.type === 'confirmed') || null);
-        setShowBillDisputeModal(true);
-        setTestAlertBanner(null);
-      },
-    });
-
-    try {
-      await fetch('/api/alerts/trigger', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: 'user-maria-demo', forceSend: true }),
-      });
-    } catch {
-      // offline resilience
-    }
-  };
-
-  // Trigger simulated CMS FHIR sync
-  const handleSyncFhirApi = (insurerName?: string) => {
-    if (insurerName) setSelectedInsurer(insurerName);
-    setApiSyncState('authorizing');
-    setTimeout(() => {
-      setApiSyncState('fetching');
-      setTimeout(() => {
-        setApiSyncState('synced');
-        setIsApiConnected(true);
-        setLastApiSyncedAt('Just now');
-      }, 1200);
-    }, 1000);
-  };
 
   // Chat State
   const [chatMessages, setChatMessages] = useState<Array<{
@@ -526,6 +112,28 @@ export default function App() {
   const [chatLoading, setChatLoading] = useState(false);
   const chatBottomRef = useRef<HTMLDivElement>(null);
 
+  // Audio chime for text alert delivery
+  const playAlertChime = () => {
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.35);
+    } catch {
+      // Audio muted or unsupported
+    }
+  };
+
   // Reset chat welcome when persona or language changes
   useEffect(() => {
     setChatMessages([
@@ -533,16 +141,16 @@ export default function App() {
         role: 'beni',
         text:
           lang === 'es'
-            ? `¡Hola ${persona.name}! Soy Beni, tu asistente de beneficios de salud. Revisé tus documentos subidos y tu ingreso mensual de $${userMonthlyIncome.toLocaleString()}. Encontré posibles ahorros y cargos duplicados. ¿En qué te puedo ayudar hoy?`
+            ? `¡Hola ${persona.name}! Soy Beni, tu asistente de beneficios de salud. Revisé tus documentos subidos y tu ingreso verificado de $${userMonthlyIncome.toLocaleString()}. Encontré posibles ahorros y cobros duplicados. ¿En qué te puedo ayudar hoy?`
             : lang === 'fr'
-            ? `Bonjour ${persona.name} ! Je suis Beni, votre assistant IA pour vos droits de santé. J’ai analysé vos documents et votre revenu mensuel de $${userMonthlyIncome.toLocaleString()}. Comment puis-je vous aider aujourd’hui ?`
+            ? `Bonjour ${persona.name} ! Je suis Beni, votre assistant pour vos droits de santé. J'ai analysé vos documents et vos revenus de $${userMonthlyIncome.toLocaleString()}. Comment puis-je vous aider aujourd'hui ?`
             : lang === 'uk'
-            ? `Привіт, ${persona.name}! Я Бені, ваш ШІ-помічник із медичних пільг. Я перевірив ваші завантажені документи та підтверджений дохід $${userMonthlyIncome.toLocaleString()}. Чим можу допомогти?`
-            : `Hi ${persona.name}! I’m Beni, your AI health-benefits assistant. I reviewed your uploaded documents and your verified monthly income of $${userMonthlyIncome.toLocaleString()}. What can I help you with today?`,
+            ? `Привіт, ${persona.name}! Я Бені, ваш помічник із медичних пільг. Я перевірив ваші документи та дохід $${userMonthlyIncome.toLocaleString()}. Чим можу допомогти сьогодні?`
+            : `Hi ${persona.name}! I'm Beni, your AI health-benefits assistant. I reviewed your uploaded documents and your verified monthly income of $${userMonthlyIncome.toLocaleString()}. What can I help you with today?`,
         expression: 'default',
       },
     ]);
-  }, [persona, lang, userMonthlyIncome]);
+  }, [persona.id, lang, userMonthlyIncome]);
 
   // Auto-scroll chat
   useEffect(() => {
@@ -555,16 +163,15 @@ export default function App() {
     setLoginError('');
 
     if (!loginEmail.trim()) {
-      setLoginError('Please enter your email or phone number.');
+      setLoginError(lang === 'es' ? 'Por favor ingresa tu correo.' : 'Please enter your email or phone number.');
       return;
     }
 
     if (loginPassword !== 'beni2026' && loginPassword.length < 4) {
-      setLoginError('Incorrect password. Demo password is: beni2026');
+      setLoginError(lang === 'es' ? 'Contraseña incorrecta. La contraseña de prueba es: beni2026' : 'Incorrect password. Demo password is: beni2026');
       return;
     }
 
-    // Set persona based on email or default to Maria
     if (loginEmail.toLowerCase().includes('ana')) {
       handleSelectDemoPersona('ana');
     } else if (loginEmail.toLowerCase().includes('joe')) {
@@ -577,13 +184,11 @@ export default function App() {
   // Quick 1-Click Demo Persona Login
   const handleSelectDemoPersona = (pKey: 'maria' | 'ana' | 'joe') => {
     setActivePersonaKey(pKey);
-    const p = DEMO_PERSONAS[pKey];
+    const p = getLocalizedPersona(pKey, lang);
     setUserMonthlyIncome(p.incomeMonthly);
     setUserHouseholdSize(p.householdSize);
     setUserZip(p.location.split(' ')[1] || '11201');
     setIsLoggedIn(true);
-
-    // If logging in for the first time, take them to Connect & Income Verification
     setActiveScreen('connect');
     setHasVerifiedIncomeAndDocs(false);
   };
@@ -595,8 +200,71 @@ export default function App() {
     setActiveScreen('connect');
   };
 
-  // Handle Chat Submit with Context-Aware AI Grounding
-  const handleSendChat = (presetText?: string) => {
+  // Trigger Real / Simulated SMS Alert via /api/sms/send-alert
+  const handleSendRealSmsAlert = async () => {
+    setIsSendingSms(true);
+    setSmsSentSuccessMsg('');
+
+    try {
+      const res = await fetch('/api/sms/send-alert', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone: userPhoneNumber,
+          alertType: 'bill',
+          amount: persona.mriBill.discrepancy,
+          providerName: persona.mriBill.providerName,
+          patientName: persona.name,
+          message: `beniFIT Alert: Potential $${persona.mriBill.discrepancy.toFixed(0)} duplicate charge found from ${persona.mriBill.providerName}. Tap to review draft dispute.`,
+        }),
+      });
+      await res.json();
+      setSmsSentSuccessMsg(t.smsSuccessNotice);
+      playAlertChime();
+
+      setIncomingSmsBanner({
+        header: t.smsMessagesNow,
+        sender: t.smsIncomingHeader,
+        message: `🚨 ${persona.mriBill.providerName}: $${persona.mriBill.discrepancy.toFixed(0)} duplicate billing detected. ${t.smsTapToReview}`,
+        onTap: () => {
+          setSelectedBillFinding(persona.findings.find((f) => f.type === 'confirmed') || null);
+          setShowBillDisputeModal(true);
+          setIncomingSmsBanner(null);
+        },
+      });
+    } catch {
+      setSmsSentSuccessMsg(t.smsSuccessNotice);
+      playAlertChime();
+      setIncomingSmsBanner({
+        header: t.smsMessagesNow,
+        sender: t.smsIncomingHeader,
+        message: `🚨 ${persona.mriBill.providerName}: $${persona.mriBill.discrepancy.toFixed(0)} duplicate billing detected. ${t.smsTapToReview}`,
+        onTap: () => {
+          setSelectedBillFinding(persona.findings.find((f) => f.type === 'confirmed') || null);
+          setShowBillDisputeModal(true);
+          setIncomingSmsBanner(null);
+        },
+      });
+    } finally {
+      setIsSendingSms(false);
+    }
+  };
+
+  // Trigger simulated CMS FHIR sync
+  const handleSyncFhirApi = (insurerName?: string) => {
+    if (insurerName) setSelectedInsurer(insurerName);
+    setApiSyncState('authorizing');
+    setTimeout(() => {
+      setApiSyncState('fetching');
+      setTimeout(() => {
+        setApiSyncState('synced');
+        setLastApiSyncedAt('Just now');
+      }, 1200);
+    }, 1000);
+  };
+
+  // Send Chat with Server-side Gemini API Integration
+  const handleSendChat = async (presetText?: string) => {
     const text = presetText || chatInput;
     if (!text.trim() || chatLoading) return;
 
@@ -606,104 +274,65 @@ export default function App() {
     const userMsg = { role: 'user' as const, text };
     setChatMessages((prev) => [...prev, userMsg]);
 
-    // Intelligent context-aware response based on active persona & documents
-    setTimeout(() => {
-      const lower = text.toLowerCase();
-      let botResponse = '';
-      let botSource: string | undefined = undefined;
-      let botActionLabel: string | undefined = undefined;
-      let botActionScreen: ScreenId | undefined = undefined;
-      let expr: BeniExpression = 'default';
+    try {
+      const res = await fetch('/api/ask-beni', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: text,
+          lang,
+          userContext: {
+            userName: persona.name,
+            coverageName: persona.coverageName,
+            monthlyIncome: userMonthlyIncome,
+            location: persona.location,
+            householdSize: userHouseholdSize,
+            memberId: persona.memberId,
+            findings: persona.findings,
+            mriBill: persona.mriBill,
+          },
+        }),
+      });
 
-      // 1. Clinical / Medication Refusal Guardrail
-      if (
-        lower.includes('take') ||
-        lower.includes('grapefruit') ||
-        lower.includes('pain') ||
-        lower.includes('symptom') ||
-        lower.includes('prescribe') ||
-        lower.includes('dose') ||
-        lower.includes('antibiotic')
-      ) {
-        botResponse =
-          lang === 'es'
-            ? 'No puedo dar consejos médicos ni diagnósticos clínicos. Para preguntas sobre medicamentos o interacciones, por favor consulta a tu médico o farmacéutico.'
-            : 'I cannot provide clinical medical advice or diagnose symptoms. For prescription questions or drug interactions, please consult your physician or pharmacist.';
-        botSource = 'beniFIT Clinical Safety Policy';
-        expr = 'warning';
+      if (!res.ok) {
+        throw new Error('API request failed');
       }
-      // 2. Medicare Uncertainty Rule
-      else if (lower.includes('medicare part d gap') || lower.includes('medicare appeal deadline')) {
-        botResponse = t.medicareNotSure;
-        botSource = 'Official Medicare Resource';
-        expr = 'not_sure';
-      }
-      // 3. Medicaid Uncertainty Rule
-      else if (lower.includes('dental specialist coverage') && persona.id === 'ana') {
-        botResponse = t.medicaidNotSure;
-        botSource = 'HarborCare Member Services';
-        expr = 'not_sure';
-      }
-      // 4. MRI Bill Check Question (Matches Screen 5 from Brand Board!)
-      else if (lower.includes('mri') || lower.includes('bill') || lower.includes('factura') || lower.includes('right')) {
-        botResponse =
-          lang === 'es'
-            ? `Revisé tus documentos. Parece que este cargo de resonancia magnética ($${persona.mriBill.discrepancy}) es un cobro duplicado. Tu seguro ya cubrió la atención contratada.`
-            : lang === 'fr'
-            ? `J'ai vérifié vos documents. Il semble que ce montant d'IRM ($${persona.mriBill.discrepancy}) soit une facturation en double. Votre assurance a déjà couvert ce soin.`
-            : `I checked your documents. It looks like this MRI charge ($${persona.mriBill.discrepancy}) may be a duplicate. You've already paid your contractual share through your insurance claim.`;
-        botSource = persona.mriBill.source;
-        botActionLabel = t.viewDetails;
-        botActionScreen = 'bills';
-        expr = 'confirmed';
-      }
-      // 5. Food Assistance / WIC
-      else if (lower.includes('food') || lower.includes('comida') || lower.includes('wic') || lower.includes('snap')) {
-        botResponse =
-          lang === 'es'
-            ? `Según tu ingreso verificado de $${userMonthlyIncome.toLocaleString()} y tu hogar en ${persona.location}, podrías calificar para beneficios mensuales de alimentos (WIC / SNAP).`
-            : `Based on your verified monthly income of $${userMonthlyIncome.toLocaleString()} and household size in ${persona.location}, you may qualify for monthly grocery benefits (WIC / SNAP).`;
-        botSource = 'NY DOH Food Guidelines';
-        botActionLabel = t.apply;
-        botActionScreen = 'planner';
-        expr = 'may_qualify';
-      }
-      // 6. FSA / Benefits Guide
-      else if (lower.includes('fsa') || lower.includes('expire') || lower.includes('perk') || lower.includes('ride')) {
-        botResponse =
-          lang === 'es'
-            ? `Tienes $320 sin gastar en tu cuenta FSA que vencen el 31 de diciembre. Los lentes recetados y botiquines califican.`
-            : `You have $320 unspent in your Flexible Spending Account that expires Dec 31. Prescription glasses and first-aid kits count!`;
-        botSource = 'Brightway 2027 Benefits Guide p.11';
-        botActionLabel = t.claimIt;
-        botActionScreen = 'planner';
-        expr = 'may_qualify';
-      }
-      // 7. General Fallback
-      else {
-        botResponse =
-          lang === 'es'
-            ? `Beni calculó $${persona.totalSavings.toLocaleString()} en total a partir de tu ingreso verificado ($${persona.confirmedTotal.toLocaleString()} confirmados en documentos y $${persona.mayQualifyTotal.toLocaleString()} en posibles programas a los que podrías calificar).`
-            : `Beni calculated $${persona.totalSavings.toLocaleString()} in total from your verified income: $${persona.confirmedTotal.toLocaleString()} confirmed from your documents, and $${persona.mayQualifyTotal.toLocaleString()} in potential benefits you may qualify for.`;
-        botSource = `${persona.coverageName} + Uploaded Papers`;
-        botActionLabel = t.whatsBeniFound;
-        botActionScreen = 'found';
-        expr = 'thinking';
-      }
+
+      const data = await res.json();
+      setChatMessages((prev) => [
+        ...prev,
+        {
+          role: 'beni',
+          text: data.reply || data.text,
+          source: data.source,
+          actionLabel: data.actionLabel,
+          actionScreen: data.actionScreen,
+          expression: (data.expression as BeniExpression) || 'default',
+        },
+      ]);
+    } catch {
+      // Local fallback in target language
+      const fallbackText =
+        lang === 'es'
+          ? `Beni revisó tus documentos de ${persona.coverageName}. Encontré un ahorro potencial total de $${persona.totalSavings.toLocaleString()}, con $${persona.confirmedTotal.toLocaleString()} confirmados en tus facturas médicas.`
+          : lang === 'fr'
+          ? `Beni a consulté vos documents de ${persona.coverageName}. Total d'économies identifiées : $${persona.totalSavings.toLocaleString()}.`
+          : lang === 'uk'
+          ? `Бені перевірив ваші документи для ${persona.coverageName}. Загальна знайдена економія: $${persona.totalSavings.toLocaleString()}.`
+          : `Beni checked your documents for ${persona.coverageName}. Total potential savings found: $${persona.totalSavings.toLocaleString()}.`;
 
       setChatMessages((prev) => [
         ...prev,
         {
           role: 'beni',
-          text: botResponse,
-          source: botSource,
-          actionLabel: botActionLabel,
-          actionScreen: botActionScreen,
-          expression: expr,
+          text: fallbackText,
+          source: `${persona.coverageName} + NY Benefits Database`,
+          expression: 'default',
         },
       ]);
+    } finally {
       setChatLoading(false);
-    }, 600);
+    }
   };
 
   // Copy dispute letter to clipboard
@@ -740,17 +369,41 @@ export default function App() {
               beni<span className="text-[#4F46E5]">FIT</span>
             </h1>
             <p className="text-xs font-bold text-[#F59E0B] uppercase tracking-wider">
-              {t.tagline}
+              {t.loginTagline}
             </p>
             <p className="text-xs text-slate-500 max-w-xs mx-auto leading-relaxed">
-              Sign in to connect your insurance, audit your medical bills, and find benefit savings.
+              {t.loginSub}
             </p>
+          </div>
+
+          {/* Language Selector on Login */}
+          <div className="flex justify-center gap-1.5 pt-1">
+            {[
+              { code: 'en' as const, flag: '🌐', label: 'EN' },
+              { code: 'es' as const, flag: '🇪🇸', label: 'ES' },
+              { code: 'fr' as const, flag: '🇫🇷', label: 'FR' },
+              { code: 'uk' as const, flag: '🇺🇦', label: 'UK' },
+            ].map((l) => (
+              <button
+                key={l.code}
+                type="button"
+                onClick={() => setLang(l.code)}
+                className={`px-2.5 py-1 rounded-full text-[11px] font-bold border transition flex items-center gap-1 ${
+                  lang === l.code
+                    ? 'bg-indigo-50 border-[#4F46E5] text-[#4F46E5]'
+                    : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
+                }`}
+              >
+                <span>{l.flag}</span>
+                <span>{l.label}</span>
+              </button>
+            ))}
           </div>
 
           {/* 1-Click Demo Logins */}
           <div className="space-y-2.5">
             <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block text-center">
-              1-Click Demo Profiles (Hackathon):
+              {t.loginDemoProfiles}
             </span>
             <div className="space-y-2">
               <button
@@ -769,7 +422,7 @@ export default function App() {
                     </div>
                   </div>
                 </div>
-                <ArrowRight className="w-4 h-4 text-[#4F46E5] group-hover:translate-x-1 transition" />
+                <span className="text-xs font-bold text-[#4F46E5]">→</span>
               </button>
 
               <button
@@ -788,7 +441,7 @@ export default function App() {
                     </div>
                   </div>
                 </div>
-                <ArrowRight className="w-4 h-4 text-[#4F46E5] group-hover:translate-x-1 transition" />
+                <span className="text-xs font-bold text-[#4F46E5]">→</span>
               </button>
 
               <button
@@ -807,7 +460,7 @@ export default function App() {
                     </div>
                   </div>
                 </div>
-                <ArrowRight className="w-4 h-4 text-[#4F46E5] group-hover:translate-x-1 transition" />
+                <span className="text-xs font-bold text-[#4F46E5]">→</span>
               </button>
             </div>
           </div>
@@ -817,7 +470,9 @@ export default function App() {
               <div className="w-full border-t border-slate-200"></div>
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-slate-400 font-semibold text-[10px]">Or sign in with email</span>
+              <span className="bg-white px-2 text-slate-400 font-semibold text-[10px]">
+                {t.loginOrEmail}
+              </span>
             </div>
           </div>
 
@@ -829,7 +484,9 @@ export default function App() {
               </div>
             )}
             <div>
-              <label className="text-xs font-bold text-[#0F172A] block mb-1">Email or Phone</label>
+              <label className="text-xs font-bold text-[#0F172A] block mb-1">
+                {t.loginEmailOrPhone}
+              </label>
               <input
                 type="text"
                 value={loginEmail}
@@ -840,7 +497,9 @@ export default function App() {
             </div>
 
             <div>
-              <label className="text-xs font-bold text-[#0F172A] block mb-1">Password</label>
+              <label className="text-xs font-bold text-[#0F172A] block mb-1">
+                {t.loginPassword}
+              </label>
               <input
                 type="password"
                 value={loginPassword}
@@ -855,17 +514,20 @@ export default function App() {
               className="w-full py-3 bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded-xl font-bold text-xs shadow-md transition flex items-center justify-center gap-1.5"
             >
               <Lock className="w-3.5 h-3.5" />
-              Sign In to beniFIT
+              {t.loginSignInBtn}
             </button>
           </form>
 
-          {/* Privacy & No Assumption Notice */}
+          {/* Privacy & Zero Assumption Notice */}
           <div className="text-[11px] text-slate-400 text-center space-y-1">
             <div className="flex items-center justify-center gap-1 text-[#065F46] font-semibold">
               <Shield className="w-3.5 h-3.5" />
-              <span>Zero assumptions. We never guess your income from your phone.</span>
+              <span>{t.loginZeroAssumptions}</span>
             </div>
-            <div>Password for all demo accounts: <code className="font-mono text-[#0F172A] font-bold">beni2026</code></div>
+            <div>
+              {t.loginDemoPasswordNotice}{' '}
+              <code className="font-mono text-[#0F172A] font-bold">beni2026</code>
+            </div>
           </div>
         </div>
       </div>
@@ -885,7 +547,7 @@ export default function App() {
           <div className="flex items-center gap-1.5 text-[#92400E] font-bold truncate">
             <Shield className="w-3.5 h-3.5 text-[#D97706] shrink-0" />
             <span className="truncate">
-              Income: <strong>${userMonthlyIncome.toLocaleString()}/mo</strong> (User Provided)
+              {t.incomeHeaderLabel} <strong>${userMonthlyIncome.toLocaleString()}{t.monthSuffix}</strong>
             </span>
           </div>
           <button
@@ -893,11 +555,11 @@ export default function App() {
             className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white border border-[#FDE68A] text-[#92400E] hover:bg-amber-100 transition shrink-0 flex items-center gap-1"
           >
             <Edit3 className="w-3 h-3" />
-            Edit Income
+            {t.editIncomeBtn}
           </button>
         </div>
 
-        {/* TOP APP HEADER (Matching Brand Board Screens) */}
+        {/* TOP APP HEADER */}
         <header className="bg-white border-b border-[#E2E8F0] px-4 py-2.5 flex items-center justify-between shrink-0 sticky top-0 z-20">
           <div className="flex items-center gap-2">
             {activeScreen !== 'found' && (
@@ -921,7 +583,7 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Language Quick Dropdown */}
+            {/* Language Quick Toggle */}
             <button
               onClick={() => setActiveScreen('language')}
               className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-100 hover:bg-slate-200 text-xs font-bold text-[#0F172A] transition"
@@ -943,11 +605,11 @@ export default function App() {
               )}
             </button>
 
-            {/* My Account Profile Button (Replaces raw 3-person dropdown) */}
+            {/* My Account Profile Button */}
             <button
               onClick={() => setShowAccountModal(true)}
               className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 transition group text-left"
-              title="My Account & Coverage Profile"
+              title="My Account"
             >
               <div className="w-5 h-5 rounded-full bg-[#4F46E5] text-white text-[10px] font-black flex items-center justify-center shrink-0">
                 {persona.name.split(' ').map((n) => n[0]).join('')}
@@ -960,34 +622,38 @@ export default function App() {
           </div>
         </header>
 
-        {/* PROACTIVE ALERT TOAST / BANNER */}
-        {testAlertBanner && (
-          <div className="bg-[#FEF3C7] border-b border-[#FDE68A] px-4 py-2.5 text-xs text-[#0F172A] flex items-center justify-between gap-2 shadow-xs animate-in slide-in-from-top duration-200">
-            <div className="flex items-center gap-2 min-w-0">
-              <span className="text-base shrink-0">🚨</span>
-              <div className="min-w-0">
-                <span className="font-black text-[#92400E] block text-[10px] uppercase tracking-wider">
-                  {testAlertBanner.title}
-                </span>
-                <span className="text-[11px] font-medium text-slate-700 truncate block">
-                  {testAlertBanner.message}
-                </span>
+        {/* REALISTIC PUSH / SMS NOTIFICATION BANNER (Simulated Lockscreen Toast) */}
+        {incomingSmsBanner && (
+          <div className="bg-[#0F172A] text-white border-b-2 border-[#4F46E5] p-3 shadow-xl animate-in slide-in-from-top duration-300 z-30 cursor-pointer"
+            onClick={incomingSmsBanner.onTap}
+          >
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-start gap-2.5 min-w-0">
+                <div className="w-7 h-7 rounded-xl bg-[#4F46E5] flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
+                  <MessageCircle className="w-4 h-4 text-white" />
+                </div>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold text-slate-300 uppercase tracking-wider">
+                      {incomingSmsBanner.header}
+                    </span>
+                    <span className="text-[10px] font-bold text-amber-300 truncate">
+                      {incomingSmsBanner.sender}
+                    </span>
+                  </div>
+                  <p className="text-xs font-semibold text-white mt-0.5 leading-snug">
+                    {incomingSmsBanner.message}
+                  </p>
+                </div>
               </div>
-            </div>
-            <div className="flex items-center gap-1.5 shrink-0">
-              {testAlertBanner.actionText && (
-                <button
-                  onClick={testAlertBanner.onAction}
-                  className="px-2.5 py-1 bg-[#0F172A] hover:bg-[#1E293B] text-white text-[10px] font-bold rounded-lg transition"
-                >
-                  {testAlertBanner.actionText}
-                </button>
-              )}
               <button
-                onClick={() => setTestAlertBanner(null)}
-                className="p-1 text-slate-400 hover:text-slate-600 rounded-lg"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIncomingSmsBanner(null);
+                }}
+                className="p-1 text-slate-400 hover:text-white rounded-lg"
               >
-                <X className="w-3.5 h-3.5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -1025,16 +691,16 @@ export default function App() {
                     <div className="flex items-center gap-1.5">
                       <span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]"></span>
                       <span className="text-xs font-bold text-[#92400E] uppercase tracking-wider">
-                        1. Tell Beni What You Earn (Never Assumed)
+                        {t.step1IncomeTitle}
                       </span>
                     </div>
                     <span className="text-[10px] font-bold text-[#065F46] bg-green-50 px-2 py-0.5 rounded border border-green-200">
-                      Required
+                      {t.step1RequiredBadge}
                     </span>
                   </div>
 
                   <p className="text-[11px] text-slate-600">
-                    Beni never assumes your income based on your phone number or ZIP. Enter your household earnings so we calculate your exact New York benefits:
+                    {t.step1IncomePrompt}
                   </p>
 
                   <div className="space-y-2">
@@ -1047,25 +713,25 @@ export default function App() {
                         className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-8 pr-4 py-2 text-sm font-black text-[#0F172A] focus:outline-none focus:border-[#4F46E5]"
                         placeholder="4200"
                       />
-                      <span className="absolute right-3.5 top-2.5 text-xs text-slate-400 font-semibold">/ month</span>
+                      <span className="absolute right-3.5 top-2.5 text-xs text-slate-400 font-semibold">{t.monthSuffix}</span>
                     </div>
 
                     <div className="grid grid-cols-2 gap-2 text-xs">
                       <div>
-                        <label className="text-[10px] font-bold text-slate-500 block mb-0.5">Household Size</label>
+                        <label className="text-[10px] font-bold text-slate-500 block mb-0.5">{t.householdSizeLabel}</label>
                         <select
                           value={userHouseholdSize}
                           onChange={(e) => setUserHouseholdSize(parseInt(e.target.value, 10))}
                           className="w-full bg-slate-50 border border-slate-200 rounded-xl px-2 py-1.5 font-bold"
                         >
-                          <option value={1}>1 Person</option>
-                          <option value={2}>2 People</option>
-                          <option value={3}>3 People</option>
-                          <option value={4}>4 People</option>
+                          <option value={1}>1 {t.personSingle}</option>
+                          <option value={2}>2 {t.peoplePlural}</option>
+                          <option value={3}>3 {t.peoplePlural}</option>
+                          <option value={4}>4 {t.peoplePlural}</option>
                         </select>
                       </div>
                       <div>
-                        <label className="text-[10px] font-bold text-slate-500 block mb-0.5">New York ZIP</label>
+                        <label className="text-[10px] font-bold text-slate-500 block mb-0.5">{t.nyZipLabel}</label>
                         <input
                           type="text"
                           value={userZip}
@@ -1077,11 +743,11 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* 3 Upload / Connect Tiles (from Brand Board Screen 1) */}
+                {/* 3 Upload / Connect Tiles */}
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
                     <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
-                      2. Connect Insurance & Documents:
+                      {t.step2ConnectTitle}
                     </span>
                     <button
                       type="button"
@@ -1104,19 +770,19 @@ export default function App() {
                       </div>
                       <div>
                         <div className="font-bold text-xs text-[#0F172A] flex items-center gap-1.5">
-                          <span>CMS Interoperability API</span>
+                          <span>{t.cmsInteroperabilityTitle}</span>
                           <span className="text-[9px] font-black uppercase px-1.5 py-0.5 bg-indigo-600 text-white rounded">
                             FHIR R4
                           </span>
                         </div>
                         <div className="text-[10px] text-emerald-700 font-semibold flex items-center gap-1">
                           <CheckCircle className="w-3 h-3 text-emerald-600" />
-                          <span>Synced via Patient Access API ({lastApiSyncedAt})</span>
+                          <span>{t.cmsInteroperabilitySub} ({lastApiSyncedAt})</span>
                         </div>
                       </div>
                     </div>
                     <span className="text-[10px] font-bold px-2 py-1 bg-white text-[#4F46E5] border border-indigo-200 rounded-lg shadow-2xs">
-                      Sync API
+                      {t.syncApiBtn}
                     </span>
                   </div>
 
@@ -1130,12 +796,12 @@ export default function App() {
                           {t.healthInsurance}
                         </div>
                         <div className="text-[10px] text-green-700 font-semibold">
-                          ✓ Connected: {persona.coverageName}
+                          ✓ {persona.coverageName}
                         </div>
                       </div>
                     </div>
                     <span className="text-[10px] text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-200">
-                      {persona.claimsCount} claims
+                      {persona.claimsCount} {t.claimsCountLabel}
                     </span>
                   </div>
 
@@ -1149,7 +815,7 @@ export default function App() {
                           {t.employerBenefits}
                         </div>
                         <div className="text-[10px] text-green-700 font-semibold">
-                          ✓ Uploaded: Brightway_2027_Benefits_Guide.pdf
+                          ✓ Brightway_2027_Benefits_Guide.pdf
                         </div>
                       </div>
                     </div>
@@ -1168,18 +834,18 @@ export default function App() {
                           {t.medicalBills}
                         </div>
                         <div className="text-[10px] text-red-600 font-semibold">
-                          ✓ 1 bill audited (Mercy Grove #MG-88213)
+                          ✓ 1 bill audited ({persona.mriBill.providerName})
                         </div>
                       </div>
                     </div>
                     <span className="text-[10px] text-red-700 bg-red-50 px-2 py-0.5 rounded border border-red-200 font-bold">
-                      Flagged
+                      {t.auditedFlaggedLabel}
                     </span>
                   </div>
                 </div>
               </div>
 
-              {/* Bottom CTA: Save and Calculate */}
+              {/* Bottom CTA */}
               <div className="pt-2">
                 <button
                   onClick={() => {
@@ -1188,7 +854,7 @@ export default function App() {
                   }}
                   className="w-full py-3.5 bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded-2xl font-bold text-xs shadow-md transition flex items-center justify-center gap-2"
                 >
-                  <span>Verify Income & View Savings →</span>
+                  <span>{t.verifyAndContinueBtn}</span>
                 </button>
               </div>
             </div>
@@ -1215,9 +881,9 @@ export default function App() {
                 </p>
               </div>
 
-              {/* TWO SEPARATED CATEGORY CARDS (Strict Money Rules from Brand Board) */}
+              {/* TWO SEPARATED CATEGORY CARDS */}
               <div className="grid grid-cols-2 gap-3">
-                {/* May Qualify Card (Amber) */}
+                {/* May Qualify Card */}
                 <div className="bg-white border border-[#FDE68A] rounded-2xl p-3.5 shadow-2xs space-y-1">
                   <div className="flex items-center justify-between">
                     <span className="text-[11px] font-bold text-[#92400E]">
@@ -1233,7 +899,7 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Confirmed Card (Emerald Green) */}
+                {/* Confirmed Card */}
                 <div className="bg-white border border-[#A7F3D0] rounded-2xl p-3.5 shadow-2xs space-y-1">
                   <div className="flex items-center justify-between">
                     <span className="text-[11px] font-bold text-[#065F46]">
@@ -1314,7 +980,7 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Bottom Safety Disclaimer (Brand Board) */}
+              {/* Bottom Safety Disclaimer */}
               <div className="text-center pt-3 pb-1 text-[11px] text-slate-400">
                 {t.demoDataLabel} • {t.infoNotAdvice}
               </div>
@@ -1335,8 +1001,18 @@ export default function App() {
                 </p>
               </div>
 
-              {/* Filter Tabs (from Brand Board Screen 3) */}
+              {/* Filter Tabs */}
               <div className="flex gap-2">
+                <button
+                  onClick={() => setPlannerFilter('all')}
+                  className={`px-3 py-1.5 rounded-full text-xs font-bold transition ${
+                    plannerFilter === 'all'
+                      ? 'bg-[#4F46E5] text-white'
+                      : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+                  }`}
+                >
+                  {t.filterAll}
+                </button>
                 <button
                   onClick={() => setPlannerFilter('may_qualify')}
                   className={`px-3 py-1.5 rounded-full text-xs font-bold transition ${
@@ -1359,7 +1035,7 @@ export default function App() {
                 </button>
               </div>
 
-              {/* Cards List with Exactly ONE Primary Action Button */}
+              {/* Cards List */}
               <div className="space-y-3">
                 {persona.findings
                   .filter((f) => plannerFilter === 'all' || f.type === plannerFilter)
@@ -1437,7 +1113,7 @@ export default function App() {
                     type="text"
                     value={plannerText}
                     onChange={(e) => setPlannerText(e.target.value)}
-                    placeholder="E.g. MRI follow-up scan, check insulin..."
+                    placeholder={t.plannerPlaceholder}
                     className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs text-[#0F172A] focus:outline-none focus:border-[#4F46E5]"
                   />
                   <button
@@ -1465,7 +1141,7 @@ export default function App() {
                 </p>
               </div>
 
-              {/* Sub-tab toggle: Discrepancy Audit vs Digital Wallet */}
+              {/* Sub-tab toggle */}
               <div className="flex bg-slate-100 p-1 rounded-2xl gap-1">
                 <button
                   type="button"
@@ -1477,7 +1153,7 @@ export default function App() {
                   }`}
                 >
                   <Receipt className="w-3.5 h-3.5" />
-                  <span>Discrepancy Audit (1)</span>
+                  <span>{t.tabDiscrepancies}</span>
                 </button>
                 <button
                   type="button"
@@ -1489,7 +1165,7 @@ export default function App() {
                   }`}
                 >
                   <CreditCard className="w-3.5 h-3.5" />
-                  <span>Digital Benefits Wallet</span>
+                  <span>{t.tabWallet}</span>
                 </button>
               </div>
 
@@ -1506,10 +1182,11 @@ export default function App() {
                   deductible={persona.deductible}
                   fsaBalance={persona.fsaBalance}
                   fsaExpires={persona.fsaExpires}
+                  t={t}
                 />
               ) : (
                 <div className="space-y-4">
-                  {/* Bill Check Card (Matching Brand Board Screen 4 Exactly) */}
+                  {/* Bill Check Card */}
                   <div className="bg-white border border-[#E2E8F0] rounded-2xl p-4 shadow-sm space-y-4">
                     <div className="flex justify-between items-start">
                       <div>
@@ -1548,10 +1225,10 @@ export default function App() {
                   <div className="bg-blue-50 border border-blue-200 rounded-2xl p-3.5 space-y-1 text-xs">
                     <div className="flex items-center gap-1.5 font-bold text-[#4F46E5]">
                       <Shield className="w-4 h-4" />
-                      <span>New York Balance Billing Protection</span>
+                      <span>{t.nyBalanceLawTitle}</span>
                     </div>
                     <p className="text-slate-600 leading-relaxed text-[11px]">
-                      Under NY Public Health Law § 2807-k, network hospitals and providers cannot bill patients for denied duplicate service lines.
+                      {t.nyBalanceLawDesc}
                     </p>
                   </div>
                 </div>
@@ -1576,13 +1253,14 @@ export default function App() {
               <DoctorFinder
                 userZip={userZip}
                 coverageName={persona.coverageName}
+                t={t}
                 onZipChange={(newZip) => setUserZip(newZip)}
               />
             </div>
           )}
 
           {/* ----------------------------------------------------------------- */}
-          {/* SCREEN 5: ASK BENI (Chat with Visible Source Citations) */}
+          {/* SCREEN 6: ASK BENI (Chat with Visible Source Citations & Gemini AI) */}
           {/* ----------------------------------------------------------------- */}
           {activeScreen === 'chat' && (
             <div className="flex-1 p-4 flex flex-col justify-between space-y-3">
@@ -1618,14 +1296,12 @@ export default function App() {
 
                       <p className="whitespace-pre-wrap">{msg.text}</p>
 
-                      {/* Visible Source Citation (Requirement from Brand Board) */}
                       {msg.source && (
                         <div className="mt-2 pt-1.5 border-t border-slate-100 text-[10px] text-slate-500 flex items-center gap-1">
                           <span className="font-semibold text-slate-700">{t.sourcesLabel}</span> {msg.source}
                         </div>
                       )}
 
-                      {/* Action Button inside Chat Bubble */}
                       {msg.actionLabel && msg.actionScreen && (
                         <div className="mt-2.5 pt-1.5 border-t border-slate-100">
                           <button
@@ -1643,7 +1319,7 @@ export default function App() {
                 {chatLoading && (
                   <div className="bg-white border border-[#E2E8F0] p-2.5 rounded-2xl text-xs text-slate-500 flex items-center gap-2 w-fit">
                     <BeniMascot size={20} expression="thinking" />
-                    <span>Beni is reading your connected documents...</span>
+                    <span>{t.readingDocsText}</span>
                   </div>
                 )}
                 <div ref={chatBottomRef} />
@@ -1652,28 +1328,28 @@ export default function App() {
               {/* Suggestion Chips */}
               <div className="flex items-center gap-1.5 overflow-x-auto text-[11px] no-scrollbar">
                 <button
-                  onClick={() => handleSendChat('Is my MRI bill right?')}
-                  className="px-2.5 py-1 bg-white hover:bg-slate-50 border border-slate-200 rounded-full whitespace-nowrap text-[#0F172A] shadow-2xs"
+                  onClick={() => handleSendChat(t.chipMriBill)}
+                  className="px-2.5 py-1 bg-white hover:bg-slate-50 border border-slate-200 rounded-full whitespace-nowrap text-[#0F172A] shadow-2xs font-semibold"
                 >
-                  Is my MRI bill right?
+                  {t.chipMriBill}
                 </button>
                 <button
-                  onClick={() => handleSendChat('What am I missing?')}
-                  className="px-2.5 py-1 bg-white hover:bg-slate-50 border border-slate-200 rounded-full whitespace-nowrap text-[#0F172A] shadow-2xs"
+                  onClick={() => handleSendChat(t.chipWhatMissing)}
+                  className="px-2.5 py-1 bg-white hover:bg-slate-50 border border-slate-200 rounded-full whitespace-nowrap text-[#0F172A] shadow-2xs font-semibold"
                 >
-                  What am I missing?
+                  {t.chipWhatMissing}
                 </button>
                 <button
-                  onClick={() => handleSendChat('Can I get help with food?')}
-                  className="px-2.5 py-1 bg-white hover:bg-slate-50 border border-slate-200 rounded-full whitespace-nowrap text-[#0F172A] shadow-2xs"
+                  onClick={() => handleSendChat(t.chipFoodHelp)}
+                  className="px-2.5 py-1 bg-white hover:bg-slate-50 border border-slate-200 rounded-full whitespace-nowrap text-[#0F172A] shadow-2xs font-semibold"
                 >
-                  Food assistance?
+                  {t.chipFoodHelp}
                 </button>
                 <button
                   onClick={() => handleSendChat('Can I take my blood pressure pills with grapefruit?')}
-                  className="px-2.5 py-1 bg-white hover:bg-slate-50 border border-red-200 text-red-700 rounded-full whitespace-nowrap shadow-2xs"
+                  className="px-2.5 py-1 bg-white hover:bg-slate-50 border border-red-200 text-red-700 rounded-full whitespace-nowrap shadow-2xs font-semibold"
                 >
-                  🛡️ Medical refusal test
+                  {t.chipSafetyTest}
                 </button>
               </div>
 
@@ -1686,8 +1362,7 @@ export default function App() {
                   onKeyDown={(e) => e.key === 'Enter' && handleSendChat()}
                   placeholder={t.chatPlaceholder}
                   className="flex-1 bg-white border border-[#E2E8F0] rounded-full px-4 py-2 text-xs text-[#0F172A] focus:outline-none focus:border-[#4F46E5] shadow-2xs"
-                >
-                </input>
+                />
                 <button
                   onClick={() => handleSendChat()}
                   disabled={!chatInput.trim() || chatLoading}
@@ -1700,12 +1375,11 @@ export default function App() {
           )}
 
           {/* ----------------------------------------------------------------- */}
-          {/* SCREEN 6: LANGUAGE TOGGLE (English, Español, Français, Ukrainian) */}
+          {/* SCREEN 7: LANGUAGE TOGGLE */}
           {/* ----------------------------------------------------------------- */}
           {activeScreen === 'language' && (
             <div className="p-6 flex flex-col justify-between flex-1 space-y-6">
               <div className="space-y-6 text-center">
-                {/* Mascot with Welcome illustration */}
                 <div className="relative inline-block mx-auto pt-2">
                   <div className="w-28 h-28 rounded-full bg-[#FEF3C7] flex items-center justify-center mx-auto shadow-inner">
                     <BeniMascot size={76} expression="waving" />
@@ -1763,7 +1437,7 @@ export default function App() {
         </main>
 
         {/* ===================================================================== */}
-        {/* BOTTOM NAVIGATION TABS (Brand Board: Home, Planner, Chat, More) */}
+        {/* BOTTOM NAVIGATION TABS */}
         {/* ===================================================================== */}
         <nav className="bg-white border-t border-[#E2E8F0] px-4 py-2 flex items-center justify-around shrink-0 z-20">
           <button
@@ -1836,7 +1510,7 @@ export default function App() {
               <div className="flex justify-between items-center border-b border-slate-100 pb-2">
                 <div className="flex items-center gap-2">
                   <BeniMascot size={26} expression="thinking" />
-                  <h3 className="font-bold text-sm text-[#0F172A]">Update Your Verified Income</h3>
+                  <h3 className="font-bold text-sm text-[#0F172A]">{t.updateIncomeTitle}</h3>
                 </div>
                 <button
                   onClick={() => setShowIncomeEditModal(false)}
@@ -1847,13 +1521,13 @@ export default function App() {
               </div>
 
               <p className="text-[11px] text-slate-500 leading-relaxed">
-                Beni never assumes your income. Enter your exact monthly household income so we can re-evaluate New York eligibility rules:
+                {t.step1IncomePrompt}
               </p>
 
               <div className="space-y-3">
                 <div>
                   <label className="font-bold text-[#0F172A] block mb-1">
-                    Monthly Household Income (Before Taxes)
+                    {t.monthlyIncomeBeforeTaxes}
                   </label>
                   <div className="relative">
                     <span className="absolute left-3.5 top-2.5 font-bold text-[#F59E0B]">$</span>
@@ -1868,20 +1542,20 @@ export default function App() {
 
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="font-bold text-[#0F172A] block mb-1">Household Size</label>
+                    <label className="font-bold text-[#0F172A] block mb-1">{t.householdSizeLabel}</label>
                     <select
                       value={userHouseholdSize}
                       onChange={(e) => setUserHouseholdSize(parseInt(e.target.value, 10))}
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs font-bold"
                     >
-                      <option value={1}>1 person</option>
-                      <option value={2}>2 people</option>
-                      <option value={3}>3 people</option>
-                      <option value={4}>4 people</option>
+                      <option value={1}>1 {t.personSingle}</option>
+                      <option value={2}>2 {t.peoplePlural}</option>
+                      <option value={3}>3 {t.peoplePlural}</option>
+                      <option value={4}>4 {t.peoplePlural}</option>
                     </select>
                   </div>
                   <div>
-                    <label className="font-bold text-[#0F172A] block mb-1">NY ZIP</label>
+                    <label className="font-bold text-[#0F172A] block mb-1">{t.nyZipLabel}</label>
                     <input
                       type="text"
                       value={userZip}
@@ -1898,7 +1572,7 @@ export default function App() {
                   onClick={() => setShowIncomeEditModal(false)}
                   className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs"
                 >
-                  Cancel
+                  {t.cancelBtn}
                 </button>
                 <button
                   type="button"
@@ -1908,7 +1582,7 @@ export default function App() {
                   }}
                   className="flex-1 py-2 bg-[#4F46E5] hover:bg-[#4338CA] text-white font-bold rounded-xl text-xs shadow-xs"
                 >
-                  Recalculate Savings
+                  {t.recalculateSavingsBtn}
                 </button>
               </div>
             </div>
@@ -1924,7 +1598,7 @@ export default function App() {
               <div className="flex justify-between items-center border-b border-slate-100 pb-2">
                 <div className="flex items-center gap-2">
                   <Receipt className="w-4 h-4 text-[#EF4444]" />
-                  <h3 className="font-bold text-sm text-[#0F172A]">{t.mriChargeTitle} Details</h3>
+                  <h3 className="font-bold text-sm text-[#0F172A]">{t.mriChargeTitle} {t.disputeModalHeader}</h3>
                 </div>
                 <button
                   onClick={() => setShowBillDisputeModal(false)}
@@ -1938,32 +1612,32 @@ export default function App() {
                 {/* Audit Numbers */}
                 <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3 space-y-1.5">
                   <div className="flex justify-between">
-                    <span className="text-slate-500">Provider Billed:</span>
+                    <span className="text-slate-500">{t.providerBilledLabel}</span>
                     <span className="font-bold text-[#0F172A]">${persona.mriBill.billed.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-500">Insurance Contract Share:</span>
+                    <span className="text-slate-500">{t.insuranceShareLabel}</span>
                     <span className="font-bold text-[#10B981]">${persona.mriBill.patientOwedPerPlan.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between pt-1 border-t border-slate-200">
-                    <span className="font-bold text-[#EF4444]">Duplicate Discrepancy:</span>
+                    <span className="font-bold text-[#EF4444]">{t.duplicateDiscrepancyLabel}</span>
                     <span className="font-black text-[#EF4444]">${persona.mriBill.discrepancy.toFixed(2)}</span>
                   </div>
                 </div>
 
                 <div className="text-[11px] text-slate-600 leading-relaxed">
-                  <strong>Findings:</strong> {persona.mriBill.errorSummary}
+                  <strong>{t.findingsLabel}</strong> {persona.mriBill.errorSummary}
                 </div>
 
                 <div className="text-[10px] text-slate-400">
-                  <strong>Source Documents:</strong> {persona.mriBill.source}
+                  <strong>{t.sourceDocumentsLabel}</strong> {persona.mriBill.source}
                 </div>
 
                 {/* Drafted Letter */}
                 <div className="space-y-1.5">
                   <div className="flex justify-between items-center">
                     <label className="text-[11px] font-bold text-[#0F172A]">
-                      Drafted Dispute Letter:
+                      {t.draftedDisputeLetterLabel}
                     </label>
                     <button
                       onClick={() => handleCopyDraft(persona.mriBill.disputeDraft)}
@@ -2005,7 +1679,7 @@ export default function App() {
         )}
 
         {/* ===================================================================== */}
-        {/* MODAL 3: MY ACCOUNT & COVERAGE PROFILE (Replaces raw 3-person dropdown) */}
+        {/* MODAL 3: MY ACCOUNT & COVERAGE PROFILE */}
         {/* ===================================================================== */}
         {showAccountModal && (
           <div className="absolute inset-0 bg-[#0F172A]/70 backdrop-blur-xs z-50 flex items-center justify-center p-4">
@@ -2017,7 +1691,7 @@ export default function App() {
                   </div>
                   <div>
                     <h3 className="font-bold text-sm text-[#0F172A]">{t.myAccount}</h3>
-                    <p className="text-[10px] text-slate-400">Coverage & Eligibility Profile</p>
+                    <p className="text-[10px] text-slate-400">{t.accountCoverageProfile}</p>
                   </div>
                 </div>
                 <button
@@ -2037,25 +1711,25 @@ export default function App() {
                       <div className="text-[11px] text-slate-500 font-medium">{persona.coverageName}</div>
                     </div>
                     <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
-                      Active Member
+                      {t.activeMemberBadge}
                     </span>
                   </div>
                   <div className="grid grid-cols-2 gap-2 pt-1 border-t border-indigo-100/60 text-[11px]">
                     <div>
-                      <span className="text-slate-400 block text-[10px]">Member ID:</span>
+                      <span className="text-slate-400 block text-[10px]">{t.memberIdLabel}:</span>
                       <span className="font-mono font-bold text-[#0F172A]">{persona.memberId}</span>
                     </div>
                     <div>
-                      <span className="text-slate-400 block text-[10px]">Group Number:</span>
+                      <span className="text-slate-400 block text-[10px]">{t.groupNumLabel}:</span>
                       <span className="font-mono font-bold text-[#0F172A]">{persona.groupNumber}</span>
                     </div>
                     <div>
-                      <span className="text-slate-400 block text-[10px]">Profile ZIP:</span>
+                      <span className="text-slate-400 block text-[10px]">{t.nyZipLabel}:</span>
                       <span className="font-bold text-[#0F172A]">{userZip} (NYC)</span>
                     </div>
                     <div>
-                      <span className="text-slate-400 block text-[10px]">Household:</span>
-                      <span className="font-bold text-[#0F172A]">{userHouseholdSize} person(s)</span>
+                      <span className="text-slate-400 block text-[10px]">{t.householdSizeLabel}:</span>
+                      <span className="font-bold text-[#0F172A]">{userHouseholdSize} {userHouseholdSize === 1 ? t.personSingle : t.peoplePlural}</span>
                     </div>
                   </div>
                 </div>
@@ -2065,7 +1739,7 @@ export default function App() {
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-1.5 text-xs font-bold text-[#92400E]">
                       <Shield className="w-3.5 h-3.5 text-[#D97706]" />
-                      <span>Verified Household Income</span>
+                      <span>{t.verifiedHouseholdIncomeTitle}</span>
                     </div>
                     <button
                       onClick={() => {
@@ -2075,15 +1749,15 @@ export default function App() {
                       className="text-[10px] font-bold text-[#92400E] hover:underline flex items-center gap-0.5"
                     >
                       <Edit3 className="w-3 h-3" />
-                      Edit
+                      {t.editIncomeBtn}
                     </button>
                   </div>
                   <div className="text-xl font-black text-[#0F172A]">
                     ${userMonthlyIncome.toLocaleString()}
-                    <span className="text-xs font-normal text-slate-500"> / month</span>
+                    <span className="text-xs font-normal text-slate-500"> {t.monthSuffix}</span>
                   </div>
                   <p className="text-[10px] text-[#92400E]/90 leading-tight">
-                    Explicitly verified by you. Beni never guesses your earnings from phone numbers.
+                    {t.incomeNoGuessNotice}
                   </p>
                 </div>
 
@@ -2092,17 +1766,17 @@ export default function App() {
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-1.5 font-bold text-xs text-[#0F172A]">
                       <Wifi className="w-3.5 h-3.5 text-[#4F46E5]" />
-                      <span>CMS Interoperability API</span>
+                      <span>{t.cmsInteroperabilityTitle}</span>
                     </div>
                     <span className="text-[9px] font-black uppercase px-1.5 py-0.5 bg-emerald-600 text-white rounded">
-                      FHIR R4 Connected
+                      {t.tokenActiveBadge}
                     </span>
                   </div>
                   <div className="text-[11px] text-slate-500">
                     Insurer: <strong className="text-slate-700">{selectedInsurer.split('/')[0]}</strong>
                   </div>
                   <div className="text-[10px] text-slate-400">
-                    Last automatic claim sync: {lastApiSyncedAt}
+                    {t.lastAutoSyncLabel} {lastApiSyncedAt}
                   </div>
                   <button
                     onClick={() => {
@@ -2112,7 +1786,7 @@ export default function App() {
                     className="w-full py-1.5 bg-white border border-slate-200 hover:border-[#4F46E5] text-[#4F46E5] font-bold rounded-xl text-[11px] transition flex items-center justify-center gap-1.5 shadow-2xs"
                   >
                     <RefreshCw className="w-3 h-3" />
-                    Manage Insurance API Connection
+                    {t.manageApiConnectionBtn}
                   </button>
                 </div>
 
@@ -2121,9 +1795,9 @@ export default function App() {
                   <div className="flex items-center gap-2">
                     <Bell className="w-4 h-4 text-[#F59E0B]" />
                     <div>
-                      <div className="font-bold text-xs text-[#0F172A]">{t.alerts}</div>
+                      <div className="font-bold text-xs text-[#0F172A]">{t.alertPrefsLabel}</div>
                       <div className="text-[10px] text-slate-500">
-                        {proactiveAlertsEnabled ? 'Active (Discrepancies & FSA)' : 'Paused'}
+                        {proactiveAlertsEnabled ? t.alertsActiveStatus : t.alertsPausedStatus}
                       </div>
                     </div>
                   </div>
@@ -2134,14 +1808,14 @@ export default function App() {
                     }}
                     className="px-2.5 py-1 bg-[#0F172A] text-white hover:bg-slate-800 text-[10px] font-bold rounded-lg transition"
                   >
-                    Configure
+                    {t.configureBtn}
                   </button>
                 </div>
 
-                {/* Quick Switch Judge Demo Persona */}
+                {/* Quick Switch Demo Persona */}
                 <div className="space-y-1.5 pt-1">
                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                    Switch Demo Persona (Judge Presentation):
+                    {t.switchJudgePersona}
                   </span>
                   <div className="grid grid-cols-3 gap-1.5">
                     {[
@@ -2177,14 +1851,14 @@ export default function App() {
                   className="px-3.5 py-2 bg-red-50 hover:bg-red-100 text-red-600 font-bold rounded-xl text-xs flex items-center gap-1.5 transition"
                 >
                   <LogOut className="w-3.5 h-3.5" />
-                  Log Out
+                  {t.logOutBtn}
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowAccountModal(false)}
                   className="flex-1 py-2 bg-[#4F46E5] hover:bg-[#4338CA] text-white font-bold rounded-xl text-xs shadow-xs transition"
                 >
-                  Done
+                  {t.doneBtn}
                 </button>
               </div>
             </div>
@@ -2192,7 +1866,7 @@ export default function App() {
         )}
 
         {/* ===================================================================== */}
-        {/* MODAL 4: PROACTIVE ALERT SYSTEM SETTINGS */}
+        {/* MODAL 4: PROACTIVE ALERT SYSTEM & REAL SMS DISPATCH */}
         {/* ===================================================================== */}
         {showAlertsModal && (
           <div className="absolute inset-0 bg-[#0F172A]/70 backdrop-blur-xs z-50 flex items-center justify-center p-4">
@@ -2203,8 +1877,8 @@ export default function App() {
                     <Bell className="w-4 h-4" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-sm text-[#0F172A]">Proactive Alert System</h3>
-                    <p className="text-[10px] text-slate-400">Automatic Savings & Discrepancy Monitoring</p>
+                    <h3 className="font-bold text-sm text-[#0F172A]">{t.alertsModalTitle}</h3>
+                    <p className="text-[10px] text-slate-400">{t.alertsModalSub}</p>
                   </div>
                 </div>
                 <button
@@ -2217,14 +1891,14 @@ export default function App() {
 
               <div className="space-y-3 overflow-y-auto flex-1 pr-1">
                 <p className="text-[11px] text-slate-500 leading-relaxed">
-                  Beni continuously audits incoming claims, hospital bills, and NY state benefit deadlines to protect your wallet before charges go to collections or deadlines expire.
+                  {t.alertsIntroDesc}
                 </p>
 
                 {/* Master Switch */}
                 <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
                   <div>
-                    <div className="font-bold text-xs text-[#0F172A]">Enable Proactive Alerts</div>
-                    <div className="text-[10px] text-slate-500">Master push & in-app notification switch</div>
+                    <div className="font-bold text-xs text-[#0F172A]">{t.enableAlertsMaster}</div>
+                    <div className="text-[10px] text-slate-500">{t.enableAlertsMasterSub}</div>
                   </div>
                   <button
                     type="button"
@@ -2245,10 +1919,8 @@ export default function App() {
                 <div className={`space-y-2 ${!proactiveAlertsEnabled ? 'opacity-50 pointer-events-none' : ''}`}>
                   <div className="p-3 rounded-2xl bg-white border border-slate-200 flex items-center justify-between">
                     <div>
-                      <div className="font-bold text-xs text-[#0F172A] flex items-center gap-1.5">
-                        <span>🚨 Duplicate & Coding Discrepancies</span>
-                      </div>
-                      <div className="text-[10px] text-slate-500">Alerts when hospital bill exceeds contract rate</div>
+                      <div className="font-bold text-xs text-[#0F172A]">{t.alertTypeDuplicate}</div>
+                      <div className="text-[10px] text-slate-500">{t.alertTypeDuplicateSub}</div>
                     </div>
                     <input
                       type="checkbox"
@@ -2260,8 +1932,8 @@ export default function App() {
 
                   <div className="p-3 rounded-2xl bg-white border border-slate-200 flex items-center justify-between">
                     <div>
-                      <div className="font-bold text-xs text-[#0F172A]">⏳ Expiring FSA & Benefit Deadlines</div>
-                      <div className="text-[10px] text-slate-500">Warns 30 days before "use-it-or-lose-it" forfeit</div>
+                      <div className="font-bold text-xs text-[#0F172A]">{t.alertTypeFsa}</div>
+                      <div className="text-[10px] text-slate-500">{t.alertTypeFsaSub}</div>
                     </div>
                     <input
                       type="checkbox"
@@ -2273,8 +1945,8 @@ export default function App() {
 
                   <div className="p-3 rounded-2xl bg-white border border-slate-200 flex items-center justify-between">
                     <div>
-                      <div className="font-bold text-xs text-[#0F172A]">📋 Annual Recertification Reminders</div>
-                      <div className="text-[10px] text-slate-500">Medicaid / Essential Plan annual renewal alerts</div>
+                      <div className="font-bold text-xs text-[#0F172A]">{t.alertTypeRenewal}</div>
+                      <div className="text-[10px] text-slate-500">{t.alertTypeRenewalSub}</div>
                     </div>
                     <input
                       type="checkbox"
@@ -2286,8 +1958,8 @@ export default function App() {
 
                   <div className="p-3 rounded-2xl bg-white border border-slate-200 flex items-center justify-between">
                     <div>
-                      <div className="font-bold text-xs text-[#0F172A]">💬 SMS Text Push Alerts</div>
-                      <div className="text-[10px] text-slate-500">Send high-priority notifications to your mobile phone</div>
+                      <div className="font-bold text-xs text-[#0F172A]">{t.alertTypeSms}</div>
+                      <div className="text-[10px] text-slate-500">{t.alertTypeSmsSub}</div>
                     </div>
                     <input
                       type="checkbox"
@@ -2298,35 +1970,45 @@ export default function App() {
                   </div>
                 </div>
 
+                {/* Real SMS Phone Number Input & Test Dispatch */}
+                <div className="p-3 rounded-2xl bg-indigo-50/70 border border-indigo-100 space-y-2">
+                  <div className="flex items-center gap-1.5 font-bold text-xs text-[#4F46E5]">
+                    <MessageCircle className="w-3.5 h-3.5" />
+                    <span>{t.smsPhoneInputLabel}</span>
+                  </div>
+                  <p className="text-[10px] text-slate-500 leading-tight">
+                    {t.smsPhoneInputSub}
+                  </p>
+                  <div className="flex gap-1.5">
+                    <input
+                      type="tel"
+                      value={userPhoneNumber}
+                      onChange={(e) => setUserPhoneNumber(e.target.value)}
+                      placeholder="(718) 555-0198"
+                      className="flex-1 bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs font-mono font-bold text-[#0F172A] focus:outline-none focus:border-[#4F46E5]"
+                    />
+                    <button
+                      type="button"
+                      disabled={isSendingSms}
+                      onClick={handleSendRealSmsAlert}
+                      className="px-3 py-1.5 bg-[#4F46E5] hover:bg-[#4338CA] disabled:opacity-50 text-white rounded-xl text-xs font-bold transition flex items-center gap-1 shadow-2xs"
+                    >
+                      {isSendingSms ? t.smsSendingBtn : t.smsSendTestBtn}
+                    </button>
+                  </div>
+                  {smsSentSuccessMsg && (
+                    <div className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg p-1.5 text-center animate-in fade-in">
+                      {smsSentSuccessMsg}
+                    </div>
+                  )}
+                </div>
+
                 {/* Quiet Hours Banner */}
                 <div className="bg-slate-50 border border-slate-200 rounded-2xl p-2.5 text-[11px] text-slate-600 flex items-center gap-2">
                   <span className="text-sm">🌙</span>
                   <div>
-                    <strong>NYC Quiet Hours Active:</strong> 10:00 PM – 8:00 AM.
-                    <div className="text-[10px] text-slate-400">Non-emergency notifications are held until morning.</div>
+                    <strong>{t.quietHoursTitle}</strong> {t.quietHoursSub}
                   </div>
-                </div>
-
-                {/* Interactive Demo Test Trigger */}
-                <div className="bg-indigo-50/70 border border-indigo-100 rounded-2xl p-3 space-y-2">
-                  <div className="flex items-center gap-1.5 font-bold text-xs text-[#4F46E5]">
-                    <Sparkles className="w-3.5 h-3.5" />
-                    <span>Live Demonstration Trigger</span>
-                  </div>
-                  <p className="text-[10px] text-slate-500">
-                    Test the proactive alert engine right now. It simulates an incoming discrepancy detection event.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      handleTriggerTestAlert();
-                      setShowAlertsModal(false);
-                    }}
-                    className="w-full py-2 bg-[#4F46E5] hover:bg-[#4338CA] text-white font-bold rounded-xl text-xs shadow-xs transition flex items-center justify-center gap-1.5"
-                  >
-                    <Bell className="w-3.5 h-3.5" />
-                    Simulate Live Alert Now
-                  </button>
                 </div>
               </div>
 
@@ -2336,7 +2018,7 @@ export default function App() {
                   onClick={() => setShowAlertsModal(false)}
                   className="w-full py-2 bg-[#0F172A] hover:bg-[#1E293B] text-white font-bold rounded-xl text-xs transition"
                 >
-                  Save Preferences
+                  {t.savePreferencesBtn}
                 </button>
               </div>
             </div>
@@ -2344,7 +2026,7 @@ export default function App() {
         )}
 
         {/* ===================================================================== */}
-        {/* MODAL 5: CMS INTEROPERABILITY & FHIR PATIENT ACCESS API */}
+        {/* MODAL 5: CMS INTEROPERABILITY & FHIR API */}
         {/* ===================================================================== */}
         {showApiConnectModal && (
           <div className="absolute inset-0 bg-[#0F172A]/70 backdrop-blur-xs z-50 flex items-center justify-center p-4">
@@ -2355,8 +2037,8 @@ export default function App() {
                     <Wifi className="w-4 h-4" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-sm text-[#0F172A]">Insurance API Connect</h3>
-                    <p className="text-[10px] text-slate-400">CMS-9115-F Interoperability Protocol</p>
+                    <h3 className="font-bold text-sm text-[#0F172A]">{t.apiConnectHeader}</h3>
+                    <p className="text-[10px] text-slate-400">{t.cmsProtocolSub}</p>
                   </div>
                 </div>
                 <button
@@ -2371,17 +2053,17 @@ export default function App() {
                 <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3 text-[11px] text-slate-600 leading-relaxed space-y-1">
                   <div className="font-bold text-[#0F172A] flex items-center gap-1.5">
                     <Shield className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>HL7® FHIR® R4 Direct Patient Access</span>
+                    <span>{t.fhirProtocolTitle}</span>
                   </div>
                   <p>
-                    Federal law mandates health insurers to provide automated FHIR API access to your claims, formulary, and Explanation of Benefits (EOB).
+                    {t.fhirProtocolDesc}
                   </p>
                 </div>
 
                 {/* Insurer Selector */}
                 <div className="space-y-1.5">
                   <label className="text-[11px] font-bold text-[#0F172A] block">
-                    Select Your Health Plan / Gateway:
+                    {t.selectHealthPlanPrompt}
                   </label>
                   <div className="space-y-1.5">
                     {[
@@ -2416,11 +2098,11 @@ export default function App() {
                 {/* API Sync Status Box */}
                 <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3 space-y-2">
                   <div className="flex justify-between items-center">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase">Live Interoperability Status</span>
+                    <span className="text-[10px] font-bold text-slate-500 uppercase">{t.liveInteroperabilityStatus}</span>
                     {apiSyncState === 'synced' && (
                       <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full flex items-center gap-1">
                         <CheckCircle className="w-3 h-3 text-emerald-600" />
-                        Token Active
+                        {t.tokenActiveBadge}
                       </span>
                     )}
                   </div>
@@ -2428,14 +2110,14 @@ export default function App() {
                   {apiSyncState === 'authorizing' && (
                     <div className="flex items-center gap-2 text-xs text-indigo-700 py-2">
                       <RefreshCw className="w-4 h-4 animate-spin text-[#4F46E5]" />
-                      <span>Authenticating SMART-on-FHIR OAuth token...</span>
+                      <span>{t.authSmartFhir}</span>
                     </div>
                   )}
 
                   {apiSyncState === 'fetching' && (
                     <div className="flex items-center gap-2 text-xs text-indigo-700 py-2">
                       <RefreshCw className="w-4 h-4 animate-spin text-[#4F46E5]" />
-                      <span>Querying ExplanationOfBenefit & Coverage bundles...</span>
+                      <span>{t.queryingBundlesStatus}</span>
                     </div>
                   )}
 
@@ -2443,10 +2125,7 @@ export default function App() {
                     <div className="space-y-1 text-[11px] text-slate-600">
                       <div>✓ <strong>FHIR Endpoint:</strong> https://fhir.nybenefits.gov/r4</div>
                       <div>✓ <strong>Resources Ingested:</strong> Patient, Coverage, 4 ExplanationOfBenefits</div>
-                      <div>✓ <strong>Discrepancies Detected:</strong> 1 duplicate hospital charge ($475.00)</div>
-                      <div className="text-[10px] text-slate-400 pt-1">
-                        Claims automatically re-audited whenever new hospital bills are uploaded.
-                      </div>
+                      <div>✓ <strong>Discrepancies Detected:</strong> 1 duplicate hospital charge (${persona.mriBill.discrepancy.toFixed(2)})</div>
                     </div>
                   )}
                 </div>
@@ -2459,7 +2138,7 @@ export default function App() {
                   onClick={() => setShowApiConnectModal(false)}
                   className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition"
                 >
-                  Close
+                  {t.closeBtn}
                 </button>
                 <button
                   type="button"
@@ -2468,9 +2147,7 @@ export default function App() {
                   className="flex-1 py-2 bg-[#4F46E5] hover:bg-[#4338CA] disabled:opacity-50 text-white font-bold rounded-xl text-xs shadow-xs transition flex items-center justify-center gap-1.5"
                 >
                   <RefreshCw className={`w-3.5 h-3.5 ${apiSyncState !== 'synced' ? 'animate-spin' : ''}`} />
-                  {apiSyncState === 'authorizing' || apiSyncState === 'fetching'
-                    ? 'Syncing FHIR API...'
-                    : 'Re-sync API Live'}
+                  {t.resyncApiLiveBtn}
                 </button>
               </div>
             </div>
