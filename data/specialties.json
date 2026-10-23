@@ -1,0 +1,58 @@
+[
+  {
+    "slug": "primary-care",
+    "displayName": "Primary Care / Family Doctor",
+    "aliases": ["primary care", "pcp", "family doctor", "internist", "general doctor", "doctor"],
+    "taxonomyCode": "208D00000X",
+    "taxonomyDescription": "General Practice / Internal Medicine / Family Medicine"
+  },
+  {
+    "slug": "cardiologist",
+    "displayName": "Cardiologist (Heart Doctor)",
+    "aliases": ["cardiologist", "heart", "cardio", "heart doctor"],
+    "taxonomyCode": "207RC0000X",
+    "taxonomyDescription": "Cardiovascular Disease"
+  },
+  {
+    "slug": "ophthalmologist",
+    "displayName": "Eye Doctor (Ophthalmology / Optometry)",
+    "aliases": ["eye doctor", "ophthalmologist", "optometrist", "vision", "eyes"],
+    "taxonomyCode": "207W00000X",
+    "taxonomyDescription": "Ophthalmology"
+  },
+  {
+    "slug": "podiatrist",
+    "displayName": "Podiatrist (Foot Doctor)",
+    "aliases": ["podiatrist", "foot doctor", "feet", "foot"],
+    "taxonomyCode": "213E00000X",
+    "taxonomyDescription": "Podiatrist"
+  },
+  {
+    "slug": "geriatrician",
+    "displayName": "Geriatric Specialist (Senior Care)",
+    "aliases": ["geriatrician", "senior care", "elder care", "geriatrics"],
+    "taxonomyCode": "207RG0300X",
+    "taxonomyDescription": "Geriatric Medicine"
+  },
+  {
+    "slug": "orthopedist",
+    "displayName": "Orthopedic Doctor (Bones & Joints)",
+    "aliases": ["orthopedist", "orthopedic", "bone doctor", "knee", "hip", "joints"],
+    "taxonomyCode": "207X00000X",
+    "taxonomyDescription": "Orthopaedic Surgery"
+  },
+  {
+    "slug": "dentist",
+    "displayName": "Dentist (Oral Health)",
+    "aliases": ["dentist", "dental", "teeth"],
+    "taxonomyCode": "122300000X",
+    "taxonomyDescription": "Dentist - General Practice"
+  },
+  {
+    "slug": "neurologist",
+    "displayName": "Neurologist (Brain & Nerves)",
+    "aliases": ["neurologist", "brain", "nerves", "neurology"],
+    "taxonomyCode": "2084N0400X",
+    "taxonomyDescription": "Neurology"
+  }
+]

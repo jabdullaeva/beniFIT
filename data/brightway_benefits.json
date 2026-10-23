@@ -1,0 +1,136 @@
+{
+  "company": "Brightway Technologies",
+  "planYear": "2027",
+  "planName": "ClearPath Comprehensive PPO",
+  "insurer": "ClearPath Health",
+  "bookletPages": 16,
+  "employee": {
+    "name": "Maria Santos",
+    "age": 38,
+    "role": "Operations Manager",
+    "fsaBalance": 420.00,
+    "fsaDeadline": "December 31, 2027",
+    "fsaGracePeriod": "March 31, 2028",
+    "wellnessCashRemaining": 225.00,
+    "wellnessRewardStepsLeft": 2
+  },
+  "perks": [
+    {
+      "id": "perk-rides",
+      "category": "Transportation",
+      "title": "Free Medical Appointment Rides",
+      "summary": "Covers up to 12 free roundtrip rides per year to doctors, imaging, and hospital appointments.",
+      "guidePage": 7,
+      "estValue": 360,
+      "vendor": "ClearPath RideCare (Uber Health partner)",
+      "terms": "Book at least 48 hours ahead. Valid for any in-network medical visit.",
+      "action": { "label": "Book a ride", "type": "ride", "vendor": "RideCare" }
+    },
+    {
+      "id": "perk-mri",
+      "category": "Imaging & Diagnostics",
+      "title": "In-Network Advanced Imaging",
+      "summary": "City Imaging is a Tier-1 preferred provider. 80% coverage after $0 imaging deductible.",
+      "guidePage": 12,
+      "estValue": 720,
+      "vendor": "City Imaging / ClearPath",
+      "terms": "Co-pay is roughly $180. Confirm radiologist reads are in-network.",
+      "action": { "label": "Call ClearPath", "type": "call", "phone": "1-800-555-PATH" }
+    },
+    {
+      "id": "perk-dietitian",
+      "category": "Wellness & Nutrition",
+      "title": "Free Registered Dietitian Visits & $10 Gym Network",
+      "summary": "Unlimited 1-on-1 virtual visits with licensed dietitians and access to 10,000+ gyms for $10/mo.",
+      "guidePage": 9,
+      "estValue": 300,
+      "vendor": "NutriFit & ActiveFit Network",
+      "terms": "No referral required. Covered at 100% preventive care.",
+      "action": { "label": "Book dietitian", "type": "book", "vendor": "NutriFit" }
+    },
+    {
+      "id": "perk-eap-eldercare",
+      "category": "Caregiving & Mental Health",
+      "title": "5 Free Counseling Sessions & $6/hr Backup Elder Care",
+      "summary": "Confidential counseling for stress or grief, plus vetted in-home caregiver assistance for aging parents.",
+      "guidePage": 14,
+      "estValue": 450,
+      "vendor": "Talk Line EAP & CareBridge Elder Support",
+      "terms": "5 free sessions per life event. Backup elder care subsidized down to $6/hour.",
+      "action": { "label": "Call Talk Line", "type": "call", "phone": "1-888-555-TALK" }
+    },
+    {
+      "id": "perk-pt-movewell",
+      "category": "Physical Health",
+      "title": "Free Virtual Physical Therapy (MoveWell)",
+      "summary": "Personalized PT for joint, knee, or back pain with motion sensor kit shipped free to your home.",
+      "guidePage": 11,
+      "estValue": 400,
+      "vendor": "MoveWell Digital MSK",
+      "terms": "Zero copay. Includes resistance bands and tablet sensors.",
+      "action": { "label": "Open MoveWell", "type": "app", "vendor": "MoveWell" }
+    },
+    {
+      "id": "perk-tuition",
+      "category": "Professional Growth",
+      "title": "Tuition Assistance up to $5,250/year",
+      "summary": "Reimbursement for job-related degree, data, certificate, and tech courses.",
+      "guidePage": 15,
+      "estValue": 5250,
+      "vendor": "LearnUp Brightway Portal",
+      "terms": "Submit course approval prior to start date.",
+      "action": { "label": "Open LearnUp", "type": "app", "vendor": "LearnUp" }
+    },
+    {
+      "id": "perk-quitkit",
+      "category": "Tobacco Cessation",
+      "title": "Quit Kit Coaching ($40/Paycheck Surcharge Refund)",
+      "summary": "Complete 5 free coaching sessions to quit smoking/vaping and eliminate the $40 surcharge.",
+      "guidePage": 8,
+      "estValue": 960,
+      "vendor": "Quit Kit Coaches",
+      "terms": "Takes 5 bi-weekly calls. Surcharge removed immediately upon completion.",
+      "action": { "label": "Call Quit Kit", "type": "call", "phone": "1-800-QUIT-NOW" }
+    },
+    {
+      "id": "perk-second-opinion",
+      "category": "Specialist Care",
+      "title": "SecondLook Free Expert Second Opinion",
+      "summary": "Before major surgery (orthopedic, cardiac, spine), consult leading national specialists at $0 cost.",
+      "guidePage": 13,
+      "estValue": 850,
+      "vendor": "SecondLook Clinical Review",
+      "terms": "Records collected on your behalf. Complete virtual report provided.",
+      "action": { "label": "Call SecondLook", "type": "call", "phone": "1-888-2ND-LOOK" }
+    }
+  ],
+  "alerts": [
+    {
+      "id": "alert-fsa-expiring",
+      "type": "Expiring Money",
+      "title": "Expiring FSA Balance",
+      "text": "$420 left in your FSA expires Dec 31. Glasses, sunscreen, and first-aid kits count.",
+      "amount": 420,
+      "dueDate": "Dec 31, 2027",
+      "action": { "label": "Claim it", "type": "claim" }
+    },
+    {
+      "id": "alert-wellness-claims",
+      "type": "Money Waiting",
+      "title": "3 Unfiled Wellness Claims",
+      "text": "Your checkup qualifies for three $75 wellness claims ($225 total). Want me to start them?",
+      "amount": 225,
+      "dueDate": "Immediate",
+      "action": { "label": "Start Claims", "type": "claim" }
+    },
+    {
+      "id": "alert-wellness-rewards",
+      "type": "Rewards",
+      "title": "Wellness Reward Target",
+      "text": "You're 2 steps from $420 in annual wellness rewards. Deadline Dec 15.",
+      "amount": 420,
+      "dueDate": "Dec 15, 2027",
+      "action": { "label": "View Steps", "type": "steps" }
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+[
+  {
+    "id": "fact-ny-msp-asset-test",
+    "topic": "Medicare Savings Programs",
+    "fact": "Did you know New York completely eliminated the asset test for Medicare Savings Programs? That means your savings, car, or home don't count against qualifying for NY to pay your $185/mo Part B premium.",
+    "source": "New York State Department of Health (NYSDOH)",
+    "sourceUrl": "https://www.health.ny.gov/health_care/medicaid/program/medicare_savings/",
+    "programId": "ny-msp"
+  },
+  {
+    "id": "fact-snap-senior-restaurants",
+    "topic": "SNAP / Food Relief",
+    "fact": "In New York City and several NY counties, eligible older and disabled adults on SNAP can use their EBT benefits to purchase hot meals at participating restaurants through the Restaurant Meals Program.",
+    "source": "NY OTDA & NYC Department of Social Services",
+    "sourceUrl": "https://otda.ny.gov/programs/snap/",
+    "programId": "ny-snap"
+  },
+  {
+    "id": "fact-extra-help-lis",
+    "topic": "Prescription Drug Costs",
+    "fact": "Medicare Part D Extra Help is worth an estimated $5,300 per year on average. It caps your copays at no more than $4.90 for generic prescriptions and $12.15 for brand-name medicines.",
+    "source": "Centers for Medicare & Medicaid Services (CMS)",
+    "sourceUrl": "https://www.cms.gov/priorities/innovation/innovation-models/extra-help",
+    "programId": "ny-extra-help"
+  },
+  {
+    "id": "fact-wellness-visit-zero-cost",
+    "topic": "Preventive Care",
+    "fact": "Under Medicare Part B, your Annual Wellness Visit and most preventive screenings (like mammograms and colonoscopies) have $0 deductible and $0 copay from participating doctors.",
+    "source": "Medicare.gov Official Guide",
+    "sourceUrl": "https://www.medicare.gov/coverage/yearly-wellness-visits",
+    "programId": "ny-msp"
+  },
+  {
+    "id": "fact-epic-no-gap",
+    "topic": "NY EPIC Program",
+    "fact": "New York is one of the few states with its own dedicated pharmaceutical assistance program (EPIC) for seniors 65+ with income up to $75,000 (single) or $100,000 (married).",
+    "source": "NY State Department of Health EPIC Bureau",
+    "sourceUrl": "https://www.health.ny.gov/health_care/epic/",
+    "programId": "ny-epic"
+  },
+  {
+    "id": "fact-cooling-assistance",
+    "topic": "Summer HEAP Cooling",
+    "fact": "Did you know New York HEAP also provides a Cooling Assistance benefit that provides a free air conditioner and installation to eligible vulnerable households during hot summer months?",
+    "source": "NY OTDA HEAP Cooling Component",
+    "sourceUrl": "https://otda.ny.gov/programs/heap/",
+    "programId": "ny-heap"
+  }
+]

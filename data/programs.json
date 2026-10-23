@@ -1,0 +1,361 @@
+[
+  {
+    "id": "ny-msp",
+    "name": "New York Medicare Savings Program (QMB / QI)",
+    "agency": "New York State Department of Health (NYSDOH)",
+    "summary_plain": "New York State pays your monthly Medicare Part B premium ($185.00/month or more), putting over $2,220 a year back into your Social Security check.",
+    "audience": {
+      "ageMin": 65,
+      "ageMax": null,
+      "requiresCoverage": ["medicare"],
+      "notCoveredBy": []
+    },
+    "eligibility": {
+      "incomeRule": {
+        "type": "table",
+        "byHouseholdSize": {
+          "1": 2564,
+          "2": 3469,
+          "3": 4375,
+          "4": 5280
+        },
+        "notes": "NY expanded MSP up to ~300% FPL in 2023 for QI and 138% for QMB. No asset test in New York.",
+        "asOfYear": "2025-2026"
+      },
+      "assetRule": null,
+      "otherConditions": [
+        "Must be enrolled or eligible for Medicare Part A",
+        "Must reside in New York State",
+        "No resource/asset test required in New York"
+      ]
+    },
+    "benefit": {
+      "description": "Pays the Medicare Part B monthly premium ($185.00/mo) and for QMB pays Part A/B deductibles and coinsurance.",
+      "estMonthlyValue": 185
+    },
+    "howToApply": {
+      "url": "https://www.health.ny.gov/health_care/medicaid/program/medicare_savings/",
+      "phone": "1-800-541-2831",
+      "steps": [
+        "Download the 1-page MSP application (DOH-4328) from NYSDOH or your local Dept of Social Services.",
+        "Include proof of income and a copy of your red, white, and blue Medicare card.",
+        "Mail or drop off at your local Department of Social Services (HRA in NYC)."
+      ]
+    },
+    "deadlines": [
+      {
+        "title": "Year-round enrollment",
+        "description": "You can apply for the Medicare Savings Program at any time of year without waiting for open enrollment."
+      }
+    ],
+    "sources": [
+      {
+        "title": "NYSDOH Medicare Savings Program Overview",
+        "url": "https://www.health.ny.gov/health_care/medicaid/program/medicare_savings/",
+        "retrievedOn": "2026-10-23"
+      },
+      {
+        "title": "Medicare Rights Center NY MSP Expansion Summary",
+        "url": "https://www.medicarerights.org/policy/msp-expansion",
+        "retrievedOn": "2026-10-23"
+      }
+    ],
+    "lastVerified": "2026-10-23",
+    "verifiedBy": "Haven NY Research Team"
+  },
+  {
+    "id": "ny-extra-help",
+    "name": "Medicare Part D Extra Help (Low-Income Subsidy)",
+    "agency": "Social Security Administration (SSA) & CMS",
+    "summary_plain": "Helps pay for your Medicare prescription drug plan premiums, deductibles, and caps covered prescription copays at $4.90 for generics and $12.15 for brand names.",
+    "audience": {
+      "ageMin": 65,
+      "ageMax": null,
+      "requiresCoverage": ["medicare"],
+      "notCoveredBy": []
+    },
+    "eligibility": {
+      "incomeRule": {
+        "type": "table",
+        "byHouseholdSize": {
+          "1": 1903,
+          "2": 2575,
+          "3": 3247,
+          "4": 3918
+        },
+        "notes": "Up to 150% FPL under Inflation Reduction Act full Extra Help expansion.",
+        "asOfYear": "2025-2026"
+      },
+      "assetRule": "Resources under $17,220 for individuals or $34,440 for married couples (home, car, and personal items not counted). Note: Enrolling in NY MSP automatically qualifies you for Extra Help without an asset test!",
+      "otherConditions": [
+        "Must have Medicare Part A and/or Part B",
+        "Automatic qualification if enrolled in NY Medicare Savings Program"
+      ]
+    },
+    "benefit": {
+      "description": "Zero Part D plan premium for benchmark plans, zero deductible, and low copays for all formulary medications.",
+      "estMonthlyValue": 440
+    },
+    "howToApply": {
+      "url": "https://www.ssa.gov/medicare/part-d-extra-help",
+      "phone": "1-800-772-1213",
+      "steps": [
+        "Apply online in 15 minutes at ssa.gov/extrahelp.",
+        "Or call SSA at 1-800-772-1213 (TTY 1-800-325-0778) to request a paper form SSA-1020.",
+        "Tip: If you apply for NY MSP, Social Security will automatically enroll you in Extra Help!"
+      ]
+    },
+    "deadlines": [
+      {
+        "title": "Continuous Enrollment",
+        "description": "Apply anytime. Extra Help also grants a Special Enrollment Period to switch drug plans once per calendar quarter."
+      }
+    ],
+    "sources": [
+      {
+        "title": "SSA Extra Help Program Guide",
+        "url": "https://www.ssa.gov/medicare/part-d-extra-help",
+        "retrievedOn": "2026-10-23"
+      }
+    ],
+    "lastVerified": "2026-10-23",
+    "verifiedBy": "Haven NY Research Team"
+  },
+  {
+    "id": "ny-epic",
+    "name": "NY Elderly Pharmaceutical Insurance Coverage (EPIC)",
+    "agency": "New York State Department of Health",
+    "summary_plain": "A New York State program for seniors aged 65 and older that helps pay Medicare Part D drug plan premiums and supplements your prescription drug coverage.",
+    "audience": {
+      "ageMin": 65,
+      "ageMax": null,
+      "requiresCoverage": ["medicare"],
+      "notCoveredBy": ["full_medicaid"]
+    },
+    "eligibility": {
+      "incomeRule": {
+        "type": "table",
+        "byHouseholdSize": {
+          "1": 6250,
+          "2": 8333,
+          "3": 8333,
+          "4": 8333
+        },
+        "notes": "Annual income limit up to $75,000 for singles and $100,000 for married couples.",
+        "asOfYear": "2025-2026"
+      },
+      "assetRule": null,
+      "otherConditions": [
+        "Must be a New York State resident",
+        "Must be age 65 or older",
+        "Must be enrolled in a Medicare Part D plan or eligible to enroll",
+        "Cannot be receiving full Medicaid benefits with no spenddown"
+      ]
+    },
+    "benefit": {
+      "description": "Pays up to the basic Part D drug premium and lowers copayments for prescription medicines at NY pharmacies.",
+      "estMonthlyValue": 45
+    },
+    "howToApply": {
+      "url": "https://www.health.ny.gov/health_care/epic/",
+      "phone": "1-800-332-3742",
+      "steps": [
+        "Complete the 1-page EPIC application form.",
+        "Provide proof of age (65+), NY residency, and copy of Part D card.",
+        "Call the EPIC Helpline at 1-800-332-3742 for assistance."
+      ]
+    },
+    "deadlines": [
+      {
+        "title": "Year-Round",
+        "description": "Enrollment is open year-round for eligible New York seniors."
+      }
+    ],
+    "sources": [
+      {
+        "title": "NYSDOH EPIC Program",
+        "url": "https://www.health.ny.gov/health_care/epic/",
+        "retrievedOn": "2026-10-23"
+      }
+    ],
+    "lastVerified": "2026-10-23",
+    "verifiedBy": "Haven NY Research Team"
+  },
+  {
+    "id": "ny-snap",
+    "name": "New York SNAP (Supplemental Nutrition Assistance Program / EBT)",
+    "agency": "NY Office of Temporary and Disability Assistance (OTDA)",
+    "summary_plain": "Provides an Electronic Benefit Transfer (EBT) card loaded with monthly grocery money to spend at supermarkets, farmers markets, and grocery stores across New York.",
+    "audience": {
+      "ageMin": 0,
+      "ageMax": null,
+      "requiresCoverage": [],
+      "notCoveredBy": []
+    },
+    "eligibility": {
+      "incomeRule": {
+        "type": "table",
+        "byHouseholdSize": {
+          "1": 2510,
+          "2": 3407,
+          "3": 4303,
+          "4": 5200
+        },
+        "notes": "New York uses Broad-Based Categorical Eligibility: households with an elderly (60+) or disabled member qualify up to 200% FPL with no asset test.",
+        "asOfYear": "2025-2026"
+      },
+      "assetRule": null,
+      "otherConditions": [
+        "New York State resident",
+        "U.S. citizen or qualified legal resident",
+        "No asset test in NY for most households under BBCE"
+      ]
+    },
+    "benefit": {
+      "description": "Monthly grocery benefit loaded directly onto an NY EBT card. Average senior benefit in NY is $180-$240/mo.",
+      "estMonthlyValue": 210
+    },
+    "howToApply": {
+      "url": "https://mybenefits.ny.gov/",
+      "phone": "1-800-342-3009",
+      "steps": [
+        "Apply online at myBenefits.ny.gov or via Access HRA (in NYC).",
+        "Or mail an application to your local Department of Social Services.",
+        "Complete a short telephone interview with a caseworker."
+      ]
+    },
+    "deadlines": [
+      {
+        "title": "Rolling 30-day processing",
+        "description": "Benefits are granted within 30 days of application, or within 5 days if eligible for expedited food relief."
+      }
+    ],
+    "sources": [
+      {
+        "title": "NY OTDA SNAP Eligibility",
+        "url": "https://otda.ny.gov/programs/snap/",
+        "retrievedOn": "2026-10-23"
+      }
+    ],
+    "lastVerified": "2026-10-23",
+    "verifiedBy": "Haven NY Research Team"
+  },
+  {
+    "id": "ny-essential-plan",
+    "name": "NY Essential Plan / Medicaid (NY State of Health)",
+    "agency": "New York State of Health (NYSOH)",
+    "summary_plain": "Comprehensive health insurance with $0 monthly premium, $0 deductible, and very low copays for low- and moderate-income New Yorkers under age 65.",
+    "audience": {
+      "ageMin": 18,
+      "ageMax": 64,
+      "requiresCoverage": ["none", "marketplace", "not_sure"],
+      "notCoveredBy": ["medicare"]
+    },
+    "eligibility": {
+      "incomeRule": {
+        "type": "table",
+        "byHouseholdSize": {
+          "1": 3138,
+          "2": 4258,
+          "3": 5378,
+          "4": 6500
+        },
+        "notes": "Essential Plan expanded in New York up to 250% FPL under 1332 State Innovation Waiver ($0 monthly premium).",
+        "asOfYear": "2025-2026"
+      },
+      "assetRule": null,
+      "otherConditions": [
+        "Ages 19 to 64",
+        "New York State resident",
+        "Not eligible for Medicare or affordable employer-sponsored coverage"
+      ]
+    },
+    "benefit": {
+      "description": "Comprehensive medical, prescription, vision, and dental coverage with $0 monthly premium and $0 deductible.",
+      "estMonthlyValue": 450
+    },
+    "howToApply": {
+      "url": "https://nystateofhealth.ny.gov/",
+      "phone": "1-855-355-5777",
+      "steps": [
+        "Go to nystateofhealth.ny.gov or call 1-855-355-5777.",
+        "Work with a free local Certified Navigator or enrollment counselor.",
+        "Select an Essential Plan carrier serving your county."
+      ]
+    },
+    "deadlines": [
+      {
+        "title": "Open All Year",
+        "description": "Enrollment in the Essential Plan and Medicaid is open all year round in New York."
+      }
+    ],
+    "sources": [
+      {
+        "title": "NY State of Health Essential Plan Expansion",
+        "url": "https://info.nystateofhealth.ny.gov/EssentialPlan",
+        "retrievedOn": "2026-10-23"
+      }
+    ],
+    "lastVerified": "2026-10-23",
+    "verifiedBy": "Haven NY Research Team"
+  },
+  {
+    "id": "ny-heap",
+    "name": "New York Home Energy Assistance Program (HEAP)",
+    "agency": "NY Office of Temporary and Disability Assistance (OTDA)",
+    "summary_plain": "Grants to help low- and moderate-income New York households pay for heating fuel, electricity bills, cooling equipment in summer, and furnace repairs.",
+    "audience": {
+      "ageMin": 0,
+      "ageMax": null,
+      "requiresCoverage": [],
+      "notCoveredBy": []
+    },
+    "eligibility": {
+      "incomeRule": {
+        "type": "table",
+        "byHouseholdSize": {
+          "1": 3035,
+          "2": 3970,
+          "3": 4903,
+          "4": 5837
+        },
+        "notes": "Based on NY State Median Income (up to ~60% of State Median Income).",
+        "asOfYear": "2025-2026"
+      },
+      "assetRule": null,
+      "otherConditions": [
+        "New York State resident",
+        "Either pay directly for heating fuel or pay for heating in rent",
+        "Automatic eligibility if household receives SNAP, Temporary Assistance, or SSI"
+      ]
+    },
+    "benefit": {
+      "description": "One-time seasonal heating or cooling benefit (ranging from $400 to $900+ paid directly to utility or heating vendor).",
+      "estMonthlyValue": 75
+    },
+    "howToApply": {
+      "url": "https://otda.ny.gov/programs/heap/",
+      "phone": "1-800-342-3009",
+      "steps": [
+        "Apply online at myBenefits.ny.gov or through your county Department of Social Services.",
+        "If 60 or older, you can apply through your local NY Office for the Aging.",
+        "Submit heating fuel bill and recent income verification."
+      ]
+    },
+    "deadlines": [
+      {
+        "title": "Seasonal Heating Window",
+        "description": "Regular HEAP opens in November each winter and remains open until funding closes in spring."
+      }
+    ],
+    "sources": [
+      {
+        "title": "NY OTDA HEAP Income Guidelines",
+        "url": "https://otda.ny.gov/programs/heap/",
+        "retrievedOn": "2026-10-23"
+      }
+    ],
+    "lastVerified": "2026-10-23",
+    "verifiedBy": "Haven NY Research Team"
+  }
+]

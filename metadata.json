@@ -1,0 +1,8 @@
+{
+  "name": "beniFIT - Benefits & Medical Bill Assistant",
+  "description": "Know what you're owed, before, during and after. beniFIT lives in your planner, catches billing errors, and uncovers hidden employer and insurance perks.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

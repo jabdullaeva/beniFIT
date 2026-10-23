@@ -1,0 +1,27 @@
+[
+  {
+    "id": "RULE_PREVENTIVE_ZERO_COST",
+    "name": "Preventive Service Charged Out-of-Pocket",
+    "description": "Flags claims where an Annual Wellness Visit or mandated preventive screening was billed with patient cost-sharing.",
+    "procedureCodes": ["G0438", "G0439", "G0402", "99387", "99397", "G0101", "G0105"],
+    "condition": "patientBilledAmount > 0 and medicareApprovedAmount > 0",
+    "messageTemplate": "This charge looks higher than what Medicare says you owe. Medicare covers Annual Wellness and preventive screenings with $0 patient responsibility.",
+    "callScript": "Hi, I am calling about billing statement for my recent wellness visit. Under Medicare Part B preventive care guidelines, this service is fully covered with $0 copay. My Medicare EOB shows $0 patient responsibility. Could you please re-bill this to Medicare or adjust my account balance?"
+  },
+  {
+    "id": "RULE_PATIENT_RESPONSIBILITY_EXCEEDS_EOB",
+    "name": "Patient Amount Exceeds Medicare EOB Stated Owed",
+    "description": "Flags bills where the provider's invoice exceeds the patient responsibility determined on the Medicare Explanation of Benefits.",
+    "condition": "patientBilledAmount > eobPatientOwedAmount + 5",
+    "messageTemplate": "Your provider's bill is higher than what Medicare says you owe on your Explanation of Benefits.",
+    "callScript": "Hello, I received a bill for ${{billedAmount}}, but my official Medicare Explanation of Benefits lists my patient responsibility as ${{eobAmount}}. Participating Medicare providers cannot bill more than Medicare's allowed amount. Could you please correct the balance?"
+  },
+  {
+    "id": "RULE_DUPLICATE_SAME_DAY",
+    "name": "Potential Duplicate Charge on Same Date",
+    "description": "Flags identical procedure codes billed twice on the exact same date by the same medical provider.",
+    "condition": "sameProviderAndDateDuplicateProcedure",
+    "messageTemplate": "We detected two identical charges on the same date from the same provider. This may be an accidental duplicate billing.",
+    "callScript": "Hello, I am reviewing my statement and noticed the procedure code {{procedureCode}} appears twice on {{serviceDate}} for the same visit. Can you verify if this was an accidental duplicate entry?"
+  }
+]

@@ -1,0 +1,31 @@
+{
+  "member": {
+    "name": "Maria Santos",
+    "memberId": "CP-BW-88391-01",
+    "groupNumber": "BW-TECH-2027",
+    "plan": "ClearPath Comprehensive PPO",
+    "employer": "Brightway Technologies"
+  },
+  "claims": [
+    {
+      "claimId": "CLM-2027-88391",
+      "eobId": "EOB-CP-99412",
+      "provider": "City Imaging Center (MetroHealth Partner)",
+      "facilityPhone": "(212) 555-0199",
+      "billingDeptPhone": "(212) 555-0180",
+      "serviceDate": "2027-10-12",
+      "procedureCode": "70553",
+      "procedureDescription": "MRI Brain with & without Contrast",
+      "billedByHospital": 2400.00,
+      "allowedByPlan": 900.00,
+      "planPaid": 720.00,
+      "mariaOwesPerEOB": 180.00,
+      "hospitalBillReceived": 480.00,
+      "overchargeAmount": 300.00,
+      "status": "flagged_discrepancy",
+      "errorType": "Provider billed amount exceeds insurance EOB patient responsibility",
+      "beniExplanation": "Your insurance says you owe $180. That's $300 too much. The hospital cannot balance-bill you beyond the ClearPath negotiated allowed rate.",
+      "disputeLetter": "To City Imaging Billing Office:\n\nRe: Invoice #INV-88391-A for Patient Maria Santos (Member ID: CP-BW-88391-01, Service Date: Oct 12, 2027).\n\nI am disputing the billed patient balance of $480.00. According to my ClearPath Explanation of Benefits (EOB #EOB-CP-99412), the contractual allowed amount for procedure 70553 is $900.00, of which ClearPath paid $720.00 (80%), leaving my patient responsibility as exactly $180.00.\n\nAs a participating network provider under ClearPath Health and pursuant to the federal No Surprises protections, billing above the contractual patient responsibility is not permitted. Please adjust my account balance from $480.00 to $180.00 and issue a corrected statement.\n\nSincerely,\nMaria Santos"
+    }
+  ]
+}
